@@ -1,9 +1,14 @@
 import express from "express";
 import { createConnection } from "typeorm";
 import { User } from "./models/User.model";
+import routes from "./routes";
+import { Profile } from "./models/Profile.Model";
+import { Post } from "./models/Post.model";
 
 const app = express();
 app.use(express.json());
+
+app.use("/api/v1", routes);
 
 const PORT = 3005;
 
@@ -14,7 +19,7 @@ createConnection({
   username: "postgres",
   password: "madhav2058",
   database: "socialMedia",
-  entities: [User],
+  entities: [User, Profile, Post],
   synchronize: true,
   // logging: true,
 })
