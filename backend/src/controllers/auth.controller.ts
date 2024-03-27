@@ -75,6 +75,7 @@ export class AuthController {
         accessToken: accessToken,
         refreshToken: refreshToken,
         user: user,
+        status: true,
         message: "Login successful",
       });
     } catch (error: any) {

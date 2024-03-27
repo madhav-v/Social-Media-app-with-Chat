@@ -14,7 +14,7 @@ export class Message {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Chat, (chat) => chat.latestMessage)
+  @ManyToOne(() => Chat)
   @JoinColumn()
   chat: Chat;
 
@@ -22,13 +22,12 @@ export class Message {
   @JoinColumn()
   sender: User;
 
-  @ManyToOne(() => User, { nullable: true })
-  @JoinColumn()
-  receiver: User;
-
-  @Column()
+  @Column({ nullable: true })
   content: string;
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
+
+  @ManyToOne(() => User)
+  readBy: User[];
 }

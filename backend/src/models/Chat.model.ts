@@ -5,6 +5,7 @@ import {
   ManyToMany,
   ManyToOne,
   JoinColumn,
+  OneToOne,
 } from "typeorm";
 import { User } from "./User.model";
 import { Message } from "./Message.model";
@@ -17,9 +18,16 @@ export class Chat {
   @Column({ nullable: true })
   chatName: string;
 
+  @Column({ default: false })
+  isGroupChat: boolean;
+
   @ManyToMany(() => User)
   @JoinColumn()
   users: User[];
+
+  @OneToOne(() => User)
+  @JoinColumn()
+  groupAdmin: User;
 
   @ManyToOne(() => Message, { nullable: true })
   @JoinColumn()

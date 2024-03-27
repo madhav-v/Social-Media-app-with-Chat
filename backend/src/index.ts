@@ -4,9 +4,18 @@ import { User } from "./models/User.model";
 import routes from "./routes";
 import { Profile } from "./models/Profile.Model";
 import { Post } from "./models/Post.model";
+import cors from "cors";
+import { FriendRequest } from "./models/FriendRequest.model";
 
 const app = express();
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: ["http://localhost:3000"],
+    credentials: true,
+  })
+);
 
 app.use("/api/v1", routes);
 
@@ -19,7 +28,7 @@ createConnection({
   username: "postgres",
   password: "madhav2058",
   database: "socialMedia",
-  entities: [User, Profile, Post],
+  entities: [User, Profile, Post, FriendRequest],
   synchronize: true,
   // logging: true,
 })
