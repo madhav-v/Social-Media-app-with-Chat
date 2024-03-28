@@ -6,6 +6,8 @@ import { Profile } from "./models/Profile.Model";
 import { Post } from "./models/Post.model";
 import cors from "cors";
 import { FriendRequest } from "./models/FriendRequest.model";
+import { Chat } from "./models/Chat.model";
+import { Message } from "./models/Message.model";
 
 const app = express();
 app.use(express.json());
@@ -27,8 +29,8 @@ createConnection({
   port: 5432,
   username: "postgres",
   password: "madhav2058",
-  database: "socialMedia",
-  entities: [User, Profile, Post, FriendRequest],
+  database: "dummy media",
+  entities: [User, Profile, Post, FriendRequest, Chat, Message],
   synchronize: true,
   // logging: true,
 })

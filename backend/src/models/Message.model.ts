@@ -18,12 +18,15 @@ export class Message {
   @JoinColumn()
   chat: Chat;
 
-  @ManyToOne(() => User, { nullable: true })
-  @JoinColumn()
+  @ManyToOne(() => User)
+  // @JoinColumn()
   sender: User;
 
   @Column({ nullable: true })
   content: string;
+
+  @Column({ type: "jsonb", nullable: true })
+  images: string[];
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
