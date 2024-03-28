@@ -31,6 +31,6 @@ export class Message {
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
 
-  @ManyToOne(() => User)
-  readBy: User[];
+  // @ManyToOne(() => User)
+  // readBy: User[];
 }
