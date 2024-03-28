@@ -11,14 +11,14 @@ import { Message } from "./models/Message.model";
 
 const app = express();
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
     origin: ["http://localhost:3000"],
     credentials: true,
   })
 );
-
+app.use("/public", express.static("public"));
 app.use("/api/v1", routes);
 
 const PORT = 3005;

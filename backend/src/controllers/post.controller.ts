@@ -19,7 +19,7 @@ export class PostController {
       if (req.files && Array.isArray(req.files)) {
         media = req.files
           .map((file: Express.Multer.File) => file.path)
-          .join(","); // Join media paths into a single string
+          .join(",");
       }
 
       const postRepository = getRepository(Post);
@@ -47,11 +47,14 @@ export class PostController {
     try {
       const postRepository = getRepository(Post);
       const userId = req.user.id;
+
       const posts = await postRepository.find({
         where: { user: Not(userId) },
       });
 
-      res.status(200).json(posts);
+      res.status(200).json({
+        data: posts,
+      });
     } catch (error: any) {
       const statusCode = error.statusCode || 500;
       const message = error.message || "An error occurred";
@@ -159,9 +162,10 @@ export class PostController {
         where: { user: { id: userId } },
       });
 
-      res.status(200).json(posts);
+      res.status(200).json({
+        data: posts,
+      });
     } catch (error: any) {
-      console.log("ho");
       const statusCode = error.statusCode || 500;
       const message = error.message || "An error occurred";
       const err = new ErrorHandler(message, statusCode);

@@ -30,14 +30,16 @@ export const checkAuth = async (
     const tokenParts = tokenString.split(" ");
     if (tokenParts.length !== 2 || !tokenParts[1]) {
       next({ status: 401, msg: "Token not set" });
-      return; 
+      return;
     }
 
     let data = jwt.verify(tokenParts[1], environment.JWT_SECRET) as JwtPayload;
-    let user = await userSvc.getUserById(data.userId);
+
+    let user = await userSvc.getUserById(data.id);
     if (!user) {
       next({ status: 403, msg: "User does not exists." });
     }
+
     req.user = user;
     next();
   } catch (error: any) {
