@@ -3,6 +3,8 @@ import ErrorHandler from "../utils/errorhandler";
 import { Not, getRepository } from "typeorm";
 import { Post } from "../models/Post.model";
 import logger from "../config/logger";
+// import { Profile } from "../models/Profile.Model";
+import { User } from "../models/User.model";
 
 interface CustomRequest extends Request {
   user?: any;
@@ -46,11 +48,15 @@ export class PostController {
   getAllPosts = async (req: CustomRequest, res: Response) => {
     try {
       const postRepository = getRepository(Post);
+      const userRepository = getRepository(User);
       const userId = req.user.id;
 
       const posts = await postRepository.find({
         where: { user: Not(userId) },
+        relations: ["user"],
       });
+
+      console.log("posts", posts);
 
       res.status(200).json({
         data: posts,

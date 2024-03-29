@@ -1,19 +1,9 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import authSvc from "../../services/auth.service";
 
-interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  bio: string;
-  profilePic: string;
-  coverPic: string;
-}
-
 const SideNavBar = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -21,7 +11,7 @@ const SideNavBar = () => {
         const response = await authSvc.getLoggedInUser();
         console.log("response", response);
 
-        setUser(response.data);
+        setUser(response);
       } catch (error) {
         console.log(error);
       }
@@ -29,6 +19,8 @@ const SideNavBar = () => {
 
     fetchUserData();
   }, []);
+
+  console.log(user);
 
   return (
     <>

@@ -2,7 +2,7 @@ import express from "express";
 import { createConnection } from "typeorm";
 import { User } from "./models/User.model";
 import routes from "./routes";
-import { Profile } from "./models/Profile.Model";
+// import { Profile } from "./models/Profile.Model";
 import { Post } from "./models/Post.model";
 import cors from "cors";
 import { FriendRequest } from "./models/FriendRequest.model";
@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:5173"],
     credentials: true,
   })
 );
@@ -30,7 +30,7 @@ createConnection({
   username: "postgres",
   password: "madhav2058",
   database: "dummy media",
-  entities: [User, Profile, Post, FriendRequest, Chat, Message],
+  entities: [User, Post, FriendRequest, Chat, Message],
   synchronize: true,
   // logging: true,
 })

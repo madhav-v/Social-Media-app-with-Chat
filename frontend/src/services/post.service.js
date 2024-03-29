@@ -2,14 +2,14 @@
 import HttpService from "./http.service";
 
 class PostService extends HttpService {
-  createPost = async (data: any) => {
+  createPost = async (data) => {
     try {
       const response = await this.postRequest("v1/post/", data, {
         auth: true,
         file: true,
       });
       return response;
-    } catch (exception: any) {
+    } catch (exception) {
       throw exception;
     }
   };
@@ -21,7 +21,7 @@ class PostService extends HttpService {
         file: false,
       });
       return response;
-    } catch (exception: any) {
+    } catch (exception) {
       throw exception;
     }
   };
@@ -33,7 +33,7 @@ class PostService extends HttpService {
         file: false,
       });
       return response;
-    } catch (exception: any) {
+    } catch (exception) {
       throw exception;
     }
   };

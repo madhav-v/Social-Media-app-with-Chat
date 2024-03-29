@@ -1,16 +1,15 @@
 import axiosInstance from "./axios.config";
 
 class AuthService {
-  async login(credentials: any) {
+  async login(credentials) {
     try {
       const response = await axiosInstance.post("/v1/auth/login", credentials);
       return response;
-    } catch (error) {
-      throw error;
+    } catch (error) {s
     }
   }
 
-  async register(data: any) {
+  async register(data) {
     try {
       const response = await axiosInstance.post("/v1/auth/register", data, {});
       return response;
@@ -19,7 +18,7 @@ class AuthService {
     }
   }
 
-  async getUserByToken(token: string) {
+  async getUserByToken(token) {
     try {
       const response = await axiosInstance.post(
         "/v1/auth/activate/" + token,
@@ -56,9 +55,7 @@ class AuthService {
     }
   }
 
-
-
-  async forgetPassword(email: string) {
+  async forgetPassword(email) {
     try {
       const response = await axiosInstance.post(
         "/v1/auth/forget-password",
@@ -75,7 +72,7 @@ class AuthService {
     }
   }
 
-  async resetPassword(userEmail: string, password: string) {
+  async resetPassword(userEmail, password) {
     try {
       const response = await axiosInstance.post(
         "/v1/auth/password-reset",
@@ -96,8 +93,6 @@ class AuthService {
       throw error;
     }
   }
-
- 
 }
 
 const authSvc = new AuthService();

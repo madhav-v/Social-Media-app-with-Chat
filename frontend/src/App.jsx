@@ -1,18 +1,16 @@
-import { Route, Routes } from "react-router-dom";
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
 import "./App.css";
-import LoginPage from "./pages/Auth/Login";
-import RegisterPage from "./pages/Auth/Register";
-// import NavBar from "./components/Navbar";
+import { Route, Routes } from "react-router-dom";
+import LoginPage from "./pages/Auth/login";
+import RegisterPage from "./pages/Auth/register";
+import ErrorPage from "./pages/Error";
 import InnerLayout from "./pages/Home/Layout";
 import DashBoard from "./pages/Home/Layout/dashboard";
-import ErrorPage from "./pages/Error";
-import Profile from "./pages/Profile";
-import ChatLayout from "./pages/Chat/Layout";
-import Chat from "./pages/Chat";
-import ChatPanel from "./pages/Chat/chatPanel";
-// import EditProfile from "./pages/Profile/edit";
 
 function App() {
+
   return (
     <>
       <Routes>
@@ -20,13 +18,13 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/home" element={<InnerLayout />}>
           <Route index element={<DashBoard />} />
-          <Route path="profile" element={<Profile />} />
-          {/* <Route path="editProfile" element={<EditProfile />} /> */}
+          {/* <Route path="profile" element={<Profile />} />
           <Route path="chat" element={<ChatLayout />}>
             <Route index element={<Chat />} />
             <Route path=":id" element={<ChatPanel />} />
-          </Route>
+          </Route> */}
         </Route>
+
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </>
