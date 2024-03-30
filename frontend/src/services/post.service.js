@@ -37,6 +37,18 @@ class PostService extends HttpService {
       throw exception;
     }
   };
+
+  getPostByUser = async (id) => {
+    try {
+      const response = await this.getRequest(`v1/post/user/${id}`, {
+        auth: true,
+        file: false,
+      });
+      return response;
+    } catch (exception) {
+      throw exception;
+    }
+  };
 }
 
 const postSvc = new PostService();

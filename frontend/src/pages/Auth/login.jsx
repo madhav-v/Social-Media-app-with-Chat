@@ -27,11 +27,10 @@ const LoginPage = () => {
       let response = await authSvc.login(data);
       if (response.status) {
         let formattedData = {
-          id: response.user._id,
-          name: response.user.name,
+          id: response.user.id,
           email: response.user.email,
         };
-        localStorage.setItem("token", response.token);
+        localStorage.setItem("token", response.accessToken);
         localStorage.setItem("user", JSON.stringify(formattedData));
         ToastAlert("succeess", "Login Successful");
         navigate("/home");

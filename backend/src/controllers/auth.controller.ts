@@ -90,4 +90,37 @@ export class AuthController {
     }
   };
 
+  getUserById = async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id); // Get the user id from request params
+      if (isNaN(userId)) {
+        throw new Error("Invalid user ID");
+      }
+
+      const userRepository = getRepository(User);
+
+      // Find the user by id
+      const user = await userRepository.findOne({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new ErrorHandler("User not found", 404);
+      }
+
+      res.status(200).json({
+        user: user,
+      });
+    } catch (error: any) {
+      const statusCode = error.statusCode || 500;
+      const message = error.message || "An error occurred";
+      const err = new ErrorHandler(message, statusCode);
+      logger.error(`Error getting user by id: ${message}`, error);
+
+      res.status(statusCode).json({
+        error: err.message,
+        message: "An error occurred",
+      });
+    }
+  };
 }

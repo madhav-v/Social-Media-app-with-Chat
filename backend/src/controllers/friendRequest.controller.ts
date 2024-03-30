@@ -131,4 +131,58 @@ export class FriendRequestController {
       });
     }
   };
+
+  getFriendRequests = async (req: CustomRequest, res: Response) => {
+    try {
+      const recipientId = req.user.id;
+
+      const friendRequests = await getRepository(FriendRequest).find({
+        where: {
+          recipient: recipientId,
+          status: "pending",
+        },
+        relations: ["sender"],
+      });
+
+      res.status(200).json({
+        friendRequests: friendRequests,
+      });
+    } catch (exception: any) {
+      const statusCode = exception.statusCode || 500;
+      const message = exception.message || "An error occurred";
+      const err = new ErrorHandler(message, statusCode); // Create an instance of ErrorHandler
+      logger.error(`Error getting friend requests: ${message}`, exception);
+      res.status(statusCode).json({
+        error: err.message,
+        message: "An error occurred",
+      });
+    }
+  };
+
+  deleteFriendRequest = async (req: CustomRequest, res: Response) => {
+    try {
+      const { requestId } = req.body;
+      const friendRequestRepository = getRepository(FriendRequest);
+      const friendRequest = await friendRequestRepository.findOne({
+        where: { id: requestId },
+      });
+
+      if (!friendRequest) {
+        return res.status(404).send("Friend request not found");
+      }
+
+      await friendRequestRepository.remove(friendRequest);
+
+      res.status(200).send("Friend request deleted successfully");
+    } catch (error: any) {
+      const statusCode = error.statusCode || 500;
+      const message = error.message || "An error occurred";
+      const err = new ErrorHandler(message, statusCode); // Create an instance of ErrorHandler
+      logger.error(`Error deleting friend request: ${message}`, error);
+      res.status(statusCode).json({
+        error: err.message,
+        message: "An error occurred",
+      });
+    }
+  };
 }

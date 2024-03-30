@@ -27,4 +27,6 @@ router.put(
   postController.updatePost
 );
 
+router.get("/user/:id", checkAuth, postController.getPostsByUser);
+
 export default router;

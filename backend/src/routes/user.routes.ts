@@ -8,15 +8,15 @@ const userCtrl = new UserController();
 
 router.post(
   "/addProfilePic",
-  upload.single("profilePic"),
   checkAuth,
+  upload.single("image"),
   userCtrl.addProfilePic
 );
 router.post("/bio", checkAuth, userCtrl.updateBio);
 router.post(
   "/addCoverPic",
-  upload.single("coverPic"),
   checkAuth,
+  upload.single("coverPic"),
   userCtrl.updateCoverPicture
 );
 router.get("/me", checkAuth, userCtrl.getLoggedInUser);

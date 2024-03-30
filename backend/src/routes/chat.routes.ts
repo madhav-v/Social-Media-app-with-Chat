@@ -13,3 +13,4 @@ router.put("/addToGroup", checkAuth, chatController.addToGroup);
 router.put("/removeFromGroup", checkAuth, chatController.removeFromGroup);
 
 export default router;
+

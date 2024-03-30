@@ -46,7 +46,10 @@ const NavBar = () => {
               </NavLink>
             </li>
             <li className="navbar-item mt-2 hover:bg-screen py-2 px-3 rounded-xl hover:bg-[#e86f73]">
-              <NavLink className="navbar-link cool-link" to="/home/requests">
+              <NavLink
+                className="navbar-link cool-link"
+                to="/home/friendRequest"
+              >
                 <BsPersonAdd size={30} color="white" />
               </NavLink>
             </li>

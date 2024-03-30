@@ -1,4 +1,4 @@
-import axiosInstance from "../config/axios.config";
+import axiosInstance from "./axios.config";
 
 class HttpService {
   headers = {};

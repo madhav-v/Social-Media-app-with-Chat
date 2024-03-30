@@ -5,7 +5,8 @@ class AuthService {
     try {
       const response = await axiosInstance.post("/v1/auth/login", credentials);
       return response;
-    } catch (error) {s
+    } catch (error) {
+      s;
     }
   }
 
@@ -18,23 +19,6 @@ class AuthService {
     }
   }
 
-  async getUserByToken(token) {
-    try {
-      const response = await axiosInstance.post(
-        "/v1/auth/activate/" + token,
-        {},
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      return response;
-    } catch (exception) {
-      console.log("Exception:", exception);
-      throw exception;
-    }
-  }
 
   async getLoggedInUser() {
     try {
@@ -93,6 +77,19 @@ class AuthService {
       throw error;
     }
   }
+
+  getUserById = async (id) => {
+    try {
+      const response = await axiosInstance.get(`/v1/auth/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      return response;
+    } catch (err) {
+      throw err;
+    }
+  };
 }
 
 const authSvc = new AuthService();

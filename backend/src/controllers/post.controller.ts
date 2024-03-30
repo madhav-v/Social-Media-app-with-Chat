@@ -183,4 +183,34 @@ export class PostController {
       });
     }
   };
+
+  getPostsByUser = async (req: CustomRequest, res: Response) => {
+    try {
+      const userId = parseInt(req.params.id); // Get the user id from request params
+      if (isNaN(userId)) {
+        throw new Error("Invalid user ID");
+      }
+
+      const postRepository = getRepository(Post);
+
+      const posts = await postRepository.find({
+        where: { user: { id: userId } },
+        relations: ["user"],
+      });
+
+      res.status(200).json({
+        data: posts,
+      });
+    } catch (error: any) {
+      const statusCode = error.statusCode || 500;
+      const message = error.message || "An error occurred";
+      const err = new ErrorHandler(message, statusCode);
+      logger.error(`Error getting posts by user: ${message}`, error);
+
+      res.status(statusCode).json({
+        error: err.message,
+        message: "An error occurred",
+      });
+    }
+  };
 }

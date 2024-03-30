@@ -11,4 +11,8 @@ router.put("/accept", checkAuth, friendRequestCtrl.acceptFriendRequest);
 
 router.get("/friends", checkAuth, friendRequestCtrl.getFriends);
 
+router.get("/get", checkAuth, friendRequestCtrl.getFriendRequests);
+
+router.delete("/delete", checkAuth, friendRequestCtrl.deleteFriendRequest);
+
 export default router;

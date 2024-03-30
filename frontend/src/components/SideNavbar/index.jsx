@@ -11,7 +11,7 @@ const SideNavBar = () => {
         const response = await authSvc.getLoggedInUser();
         console.log("response", response);
 
-        setUser(response);
+        setUser(response.data);
       } catch (error) {
         console.log(error);
       }
@@ -26,11 +26,12 @@ const SideNavBar = () => {
     <>
       <div className="mt-2 flex flex-col h-full bg-white shadow-lg p-4 rounded-lg">
         <div className="mt-4">
-          {user?.profilePic !== null ? (
+          {user && user.profilePic ? (
             <img
-              src={`${
-                import.meta.env.VITE_IMAGE_URL
-              }/${user?.profilePic.replace(/\\/g, "/")}`}
+              src={`${import.meta.env.VITE_IMAGE_URL}/${user.profilePic.replace(
+                /\\/g,
+                "/"
+              )}`}
               alt="Profile Image"
               className="rounded-3xl p-2 w-[300px] h-[300px] object-cover"
             />
