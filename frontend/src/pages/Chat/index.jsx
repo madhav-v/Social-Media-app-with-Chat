@@ -37,7 +37,8 @@ const Chat = () => {
   }, []);
 
   const handleConversationClick = (chatId, userId) => {
-    navigate(`/home/chat/${chatId}?userId=${userId}`);
+    navigate(`/home/chat/${chatId}`);
+    console.log("chat", chatId);
   };
 
   return (
@@ -56,59 +57,47 @@ const Chat = () => {
             </div>
 
             <div className="chat-sidebar w-full px-2">
-              {conversations
-                .filter((conversation) => {
-                  if (conversation.isGroupChat) {
-                    // Include group chats
-                    return true;
-                  } else {
-                    // Exclude one-on-one chats where the logged-in user is the first user
-                    return conversation.users[0]?.id !== user;
+              {conversations.map((conversation, index) => (
+                <div
+                  key={index}
+                  onClick={() =>
+                    handleConversationClick(
+                      conversation.id,
+                      conversation.users[0].id
+                    )
                   }
-                })
-                .map((conversation, index) => (
-                  <div
-                    key={index}
-                    onClick={() =>
-                      handleConversationClick(
-                        conversation.id,
-                        conversation.users[0].id
-                      )
-                    }
-                    className="cursor-pointer"
-                  >
-                    <div className="chat-person w-full p-2 md:hover:bg-gray-200 md:rounded-xl overflow-hidden cursor-pointer">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 rounded-full overflow-hidden">
-                          <img
-                            src={
-                              conversation.users[0]?.profilePic
-                                ? `${
-                                    import.meta.env.VITE_IMAGE_URL
-                                  }/${conversation.users[0]?.profilePic.replace(
-                                    /\\/g,
-                                    "/"
-                                  )}`
-                                : "https://via.placeholder.com/150"
-                            }
-                            alt="chat-friend-img"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <h6 className="font-semibold text-lg">
-                            {conversation.isGroupChat && conversation.chatName
-                              ? conversation.chatName
-                              : `${conversation.users[0]?.firstName} ${conversation.users[0]?.lastName}`}
-                          </h6>
-                          <p className="text-sm">
-                            {conversation.latestMessage}
-                          </p>
-                        </div>
+                  className="cursor-pointer"
+                >
+                  <div className="chat-person w-full p-2 md:hover:bg-gray-200 md:rounded-xl overflow-hidden cursor-pointer">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 rounded-full overflow-hidden">
+                        <img
+                          src={
+                            conversation.users[0]?.profilePic
+                              ? `${
+                                  import.meta.env.VITE_IMAGE_URL
+                                }/${conversation.users[0]?.profilePic.replace(
+                                  /\\/g,
+                                  "/"
+                                )}`
+                              : "https://via.placeholder.com/150"
+                          }
+                          alt="chat-friend-img"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h6 className="font-semibold text-lg">
+                          {conversation.isGroupChat && conversation.chatName
+                            ? conversation.chatName
+                            : `${conversation.users[0]?.firstName} ${conversation.users[0]?.lastName}`}
+                        </h6>
+                        <p className="text-sm">{conversation.latestMessage}</p>
                       </div>
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
           </div>
         </div>

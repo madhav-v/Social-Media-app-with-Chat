@@ -20,5 +20,6 @@ router.post(
   userCtrl.updateCoverPicture
 );
 router.get("/me", checkAuth, userCtrl.getLoggedInUser);
+router.get("/search", checkAuth, userCtrl.searchUser);
 
 export default router;

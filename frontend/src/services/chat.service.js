@@ -1,9 +1,9 @@
 import HttpService from "./http.service";
 
 class ChatService extends HttpService {
-  accessChat = async (data) => {
+  accessChat = async (userId) => {
     try {
-      const response = await this.postRequest("/v1/chats/access", data, {
+      const response = await this.postRequest("/v1/chats/access", userId, {
         auth: true, // Requires authentication
         file: false, // Does not support file upload
       });
@@ -71,6 +71,34 @@ class ChatService extends HttpService {
         auth: true,
         file: false,
       });
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getMessages = async (chatId) => {
+    try {
+      const response = await this.getRequest(`/v1/message/${chatId}`, {
+        auth: true,
+      });
+      return response;
+    } catch (errpr) {
+      throw error;
+    }
+  };
+
+  sendMessage = async (chatId, messageContent) => {
+    try {
+      const response = await this.postRequest(
+        `/v1/message`,
+        chatId,
+        { content: messageContent },
+        {
+          auth: true,
+          file: false,
+        }
+      );
       return response;
     } catch (error) {
       throw error;

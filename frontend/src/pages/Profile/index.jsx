@@ -1,17 +1,19 @@
 import authSvc from "../../services/auth.service";
 import { useState, useEffect } from "react";
 import postSvc from "../../services/post.service";
+import { FaEdit, FaTrash } from "react-icons/fa"; // Import FontAwesome icons
+import ToastAlert from "../../components/Toast";
+import EditPost from "../../components/Posts/edit";
 
 const Profile = () => {
   const [user, setUser] = useState();
   const [posts, setPosts] = useState();
+  const [editPostId, setEditPostId] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const response = await authSvc.getLoggedInUser();
-        console.log("logged in user", response);
-
         setUser(response.data);
       } catch (error) {
         console.log(error);
@@ -21,7 +23,6 @@ const Profile = () => {
     const fetchUserPosts = async () => {
       try {
         const response = await postSvc.getMyPosts();
-        console.log(response);
         setPosts(response.data);
       } catch (error) {
         console.log(error);
@@ -30,7 +31,23 @@ const Profile = () => {
 
     fetchUserData();
     fetchUserPosts();
-  }, []);
+  }, [posts]);
+
+  const handleEditPostClick = (postId) => {
+    setEditPostId(postId); // Set the ID of the post being edited
+  };
+
+  const handleCloseEditPopup = () => {
+    setEditPostId(null); // Reset the edit post ID to close the popup
+  };
+
+  const handleDeletePost = async (postId) => {
+    const response = await postSvc.deletePost(postId);
+    if (response) {
+      ToastAlert("success", "Post Deleted");
+    }
+  };
+
   return (
     <>
       <div className="h-full w-full mt-3 md:bg-screen md:pb-4 md:pt-[10vh]">
@@ -91,8 +108,24 @@ const Profile = () => {
           posts.map((post) => (
             <div
               key={post.id}
-              className="bg-white rounded-lg shadow-lg w-[50%] p-4 mb-4 mx-auto"
+              className="bg-white rounded-lg shadow-lg w-[50%] p-4 mb-4 mx-auto relative"
             >
+              <div className="absolute top-2 right-2 flex gap-2">
+                <button
+                  onClick={() => handleEditPostClick(post.id)}
+                  className="text-red-500 hover:text-red-500"
+                >
+                  <FaEdit />
+                </button>
+
+                <button
+                  onClick={() => handleDeletePost(post.id)}
+                  className="text-red-500 hover:text-red-500"
+                >
+                  <FaTrash />
+                </button>
+              </div>
+
               <div className="flex items-center mb-2">
                 {user?.profilePic !== null ? (
                   <img
@@ -113,7 +146,9 @@ const Profile = () => {
                   {user?.firstName} {user?.lastName}
                 </span>
               </div>
+
               <p className="text-base leading-loose mb-2">{post.content}</p>
+
               {post.media.map((image, index) => (
                 <img
                   key={index}
@@ -125,6 +160,7 @@ const Profile = () => {
                   alt={`Post ${post.id} Image ${index}`}
                 />
               ))}
+
               <div className="flex justify-between mt-4">
                 <button className="text-gray-500 hover:underline">Like</button>
                 <button className="text-gray-500 hover:underline">
@@ -134,6 +170,18 @@ const Profile = () => {
               </div>
             </div>
           ))}
+        {editPostId && (
+          <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+            <div className="bg-white rounded-lg shadow-lg p-4">
+              {/* Render EditPost component with post ID */}
+              <EditPost
+                postId={editPostId}
+                mediaFiles={posts.media}
+                onClose={handleCloseEditPopup}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

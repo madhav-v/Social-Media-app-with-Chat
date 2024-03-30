@@ -1,4 +1,5 @@
 import Posts from "../../../components/Posts";
+import CreatePost from "../../../components/Posts/create";
 import SideNavBar from "../../../components/SideNavbar/";
 
 const DashBoard = () => {
@@ -9,6 +10,7 @@ const DashBoard = () => {
           <SideNavBar />
         </div>
         <div className="h-full flex flex-col w-[100%] md:basis-[76%] md:mr-4 md:mt-20">
+          <CreatePost />
           <Posts />
         </div>
       </div>

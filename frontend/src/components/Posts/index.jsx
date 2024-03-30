@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import postSvc from "../../services/post.service";
+import { Link } from "react-router-dom";
 
 const Posts = () => {
   const [posts, setPosts] = useState();
@@ -7,7 +8,6 @@ const Posts = () => {
   const allPosts = async () => {
     try {
       const postResponse = await postSvc.getAllPosts();
-      console.log(postResponse);
       setPosts(postResponse.data);
     } catch (exception) {
       console.log(exception);
@@ -17,7 +17,6 @@ const Posts = () => {
   useEffect(() => {
     allPosts();
   }, []);
-  console.log(posts);
 
   return (
     <>
@@ -38,9 +37,11 @@ const Posts = () => {
               }
               alt="Profile picture"
             />
-            <span className="font-bold">
-              {post.user?.firstName} {post.user?.lastName}
-            </span>
+            <Link to={`/home/friends/${post.user.id}`}>
+              <span className="font-bold">
+                {post.user?.firstName} {post.user?.lastName}
+              </span>
+            </Link>
           </div>
           <p className="text-base leading-loose mb-2">{post.content}</p>
           {post.media.map((image, index) => (

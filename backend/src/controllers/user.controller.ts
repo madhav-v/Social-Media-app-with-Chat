@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import ErrorHandler from "../utils/errorhandler";
-import { getRepository } from "typeorm";
+import { Like, getRepository } from "typeorm";
 import { User } from "../models/User.model"; // Assuming you have a User model
 import logger from "../config/logger";
 
@@ -120,6 +120,33 @@ export class UserController {
       const message = error.message || "An error occurred";
       const err = new ErrorHandler(message, statusCode);
       logger.error(`Error getting logged-in user: ${message}`, error);
+      res.status(statusCode).json({
+        error: err.message,
+        message: "An error occurred",
+      });
+    }
+  };
+
+  searchUser = async (req: CustomRequest, res: Response) => {
+    try {
+      const { query } = req.query;
+      const userRepository = getRepository(User);
+
+      const users = await userRepository.find({
+        where: [
+          { firstName: Like(`%${query}%`) },
+          { lastName: Like(`%${query}%`) },
+        ],
+      });
+
+      res.status(200).json({
+        data: users,
+      });
+    } catch (error: any) {
+      const statusCode = error.statusCode || 500;
+      const message = error.message || "An error occurred";
+      const err = new ErrorHandler(message, statusCode);
+      logger.error(`Error searching user: ${message}`, error);
       res.status(statusCode).json({
         error: err.message,
         message: "An error occurred",

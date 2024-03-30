@@ -9,26 +9,29 @@ import logger from "../config/logger";
 export class ChatController {
   accessChat = async (req: CustomRequest, res: Response) => {
     try {
-      console.log(req.user);
-
       const { userId } = req.body;
-      console.log(userId);
 
       if (!userId) {
         throw new ErrorHandler("UserId not send with request", 400);
       }
 
+      console.log("req", req.user.id);
+
       const chatRepo = getRepository(Chat);
       const userRepo = getRepository(User);
-      console.log("Before existing Chat");
-
-      const existingChat = await chatRepo.findOne({
-        where: {
-          isGroupChat: false,
-          users: [req.user.id, userId],
-        },
-        relations: ["users", "latestMessage"],
-      });
+      const currentUserID = req.user.id;
+      const requestedUserID = userId;
+      const existingChat = await chatRepo
+        .createQueryBuilder("chat")
+        .leftJoinAndSelect("chat.users", "users")
+        .where("chat.isGroupChat = :isGroupChat", { isGroupChat: false })
+        .andWhere("users.id IN (:...userIDs)", {
+          userIDs: [currentUserID, requestedUserID],
+        })
+        .groupBy("chat.id")
+        .addGroupBy("users.id") // Include users.id in the GROUP BY clause
+        .having("COUNT(chat.id) = 2") // Ensure there are exactly two users in the chat
+        .getOne();
 
       if (existingChat) {
         res.send(existingChat);
@@ -46,6 +49,7 @@ export class ChatController {
           where: { id: newChat.id },
           relations: ["users", "latestMessage"],
         });
+        console.log(fullChat);
 
         res.status(201).send(fullChat);
       }
