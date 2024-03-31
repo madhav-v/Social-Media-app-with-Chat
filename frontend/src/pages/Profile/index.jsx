@@ -149,17 +149,38 @@ const Profile = () => {
 
               <p className="text-base leading-loose mb-2">{post.content}</p>
 
-              {post.media.map((image, index) => (
-                <img
-                  key={index}
-                  className="w-32 h-32 object-fill mr-2 mb-2"
-                  src={`${import.meta.env.VITE_IMAGE_URL}/${image.replace(
-                    /\\/g,
-                    "/"
-                  )}`}
-                  alt={`Post ${post.id} Image ${index}`}
-                />
-              ))}
+              {post.media.map((media, index) => {
+                if (media.endsWith(".mp4")) {
+                  return (
+                    <video
+                      key={index}
+                      controls
+                      className="w-32 h-32 object-fill mr-2 mb-2"
+                    >
+                      <source
+                        src={`${import.meta.env.VITE_IMAGE_URL}/${media.replace(
+                          /\\/g,
+                          "/"
+                        )}`}
+                        type="video/mp4"
+                      />
+                      Your browser does not support the video tag.
+                    </video>
+                  );
+                } else {
+                  return (
+                    <img
+                      key={index}
+                      className="w-32 h-32 object-fill mr-2 mb-2"
+                      src={`${import.meta.env.VITE_IMAGE_URL}/${media.replace(
+                        /\\/g,
+                        "/"
+                      )}`}
+                      alt={`Post ${post.id} Image ${index}`}
+                    />
+                  );
+                }
+              })}
 
               <div className="flex justify-between mt-4">
                 <button className="text-gray-500 hover:underline">Like</button>

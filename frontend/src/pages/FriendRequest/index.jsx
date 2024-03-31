@@ -20,7 +20,9 @@ function Connection() {
   }, []);
 
   const handleAccept = async (id) => {
-    const response = await friendRequestService.acceptFriendRequest(id);
+    const response = await friendRequestService.acceptFriendRequest({
+      recipientId: id,
+    });
     console.log(response);
     ToastAlert("success", "Friend Request Accepted");
   };

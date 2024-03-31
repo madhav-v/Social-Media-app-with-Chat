@@ -74,7 +74,9 @@ export class ChatController {
         order: { id: "DESC" },
       });
 
-      res.status(200).json(chats);
+      res.status(200).json({
+        result: chats,
+      });
     } catch (error: any) {
       const statusCode = error.statusCode || 500;
       const message = error.message || "An error occurred";

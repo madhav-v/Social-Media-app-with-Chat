@@ -15,7 +15,7 @@ const fileFilter = (req: Request, file: any, cb: any) => {
     file.mimetype === "image/jpeg" ||
     file.mimetype === "image/png" ||
     file.mimetype === "image/jpg" ||
-    file.mimetype === "video/"
+    file.mimetype === "video/mp4"
   ) {
     cb(null, true);
   } else {

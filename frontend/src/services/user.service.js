@@ -40,6 +40,22 @@ class UserService extends HttpService {
       throw error;
     }
   };
+
+  searchUsers = async (query) => {
+    try {
+      if (typeof query === "string") {
+        query = query.charAt(0).toUpperCase() + query.slice(1); // Capitalize the first letter of the query
+      }
+
+      const response = await this.getRequest(`/v1/user/search?query=${query}`, {
+        auth: true,
+      });
+
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
 }
 
 const userSvc = new UserService();

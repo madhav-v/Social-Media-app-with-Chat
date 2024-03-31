@@ -29,7 +29,7 @@ createConnection({
   port: 5432,
   username: "postgres",
   password: "madhav2058",
-  database: "dummy media",
+  database: "Social",
   entities: [User, Post, FriendRequest, Chat, Message],
   synchronize: true,
   // logging: true,

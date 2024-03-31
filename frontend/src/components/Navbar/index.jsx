@@ -6,10 +6,13 @@ import { FaRegUser } from "react-icons/fa";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ToastAlert from "../Toast";
+import userSvc from "../../services/user.service";
+import friendRequestService from "../../services/friendRequest.service"; // Import the friend request service
 
 const NavBar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -21,6 +24,30 @@ const NavBar = () => {
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleSearchChange = async (event) => {
+    setSearchQuery(event.target.value);
+    try {
+      const results = await userSvc.searchUsers(searchQuery);
+      setSearchResults(results);
+    } catch (error) {
+      console.error("Error searching users:", error);
+    }
+  };
+
+  const handleViewProfile = (userId) => {
+    navigate(`/home/friends/${userId}`);
+  };
+
+  const handleAddFriend = async (userId) => {
+    try {
+      await friendRequestService.sendFriendRequest({ recipientId: userId }); // Send friend request
+      ToastAlert("success", "Friend request sent!");
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+      ToastAlert("error", "Failed to send friend request.");
+    }
   };
 
   return (
@@ -36,6 +63,39 @@ const NavBar = () => {
         </div>
         <div className="basis-1/2 xl:basis-1/2  md:flex md:justify-between items-center hidden">
           <ul className="flex md:justify-between w-full md:basis-1/2 mr-3">
+            <li className="navbar-item inline-block mt-2">
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="p-2 rounded-md border border-gray-300"
+              />
+              {searchResults.length > 0 && (
+                <ul className="absolute bg-white border border-gray-300 rounded-md mt-1 w-[20%]">
+                  {searchResults.map((user) => (
+                    <li
+                      key={user.id}
+                      className="py-2 px-4 hover:bg-gray-100 flex items-center justify-between cursor-pointer"
+                      onClick={() => handleViewProfile(user.id)}
+                    >
+                      <div>
+                        <span className="text-lg font-bold">
+                          {user.firstName} {user.lastName}
+                        </span>
+                        <button
+                          className="ml-2 bg-red-500 text-white px-2 py-1 rounded-md"
+                          onClick={() => handleAddFriend(user.id)}
+                        >
+                          Add Friend
+                        </button>
+                      </div>
+                      <div className="flex items-center"></div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
             <li className="navbar-item inline-block mt-2 hover:bg-[#e86f6f] px-3 py-2 rounded-xl">
               <NavLink
                 className="navbar-link cool-link"

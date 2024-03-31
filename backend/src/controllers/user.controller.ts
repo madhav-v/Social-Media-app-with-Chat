@@ -129,7 +129,10 @@ export class UserController {
 
   searchUser = async (req: CustomRequest, res: Response) => {
     try {
-      const { query } = req.query;
+      let { query } = req.query;
+      if (typeof query === "string") {
+        query = query.charAt(0).toUpperCase() + query.slice(1); // Capitalize the first letter of the query
+      }
       const userRepository = getRepository(User);
 
       const users = await userRepository.find({
