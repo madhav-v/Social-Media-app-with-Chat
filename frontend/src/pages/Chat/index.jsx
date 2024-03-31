@@ -3,14 +3,12 @@ import { useNavigate } from "react-router-dom";
 import chatService from "../../services/chat.service"; // Import the chat service
 import authSvc from "../../services/auth.service";
 import userSvc from "../../services/user.service"; // Import the user service
-
+import friendRequestService from "../../services/friendRequest.service";
 const Chat = () => {
   const navigate = useNavigate();
   const [conversations, setConversations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [searchResults, setSearchResults] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchLoggedInUser = async () => {
@@ -26,31 +24,21 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    const fetchConversations = async () => {
+    const fetchFriends = async () => {
       try {
-        const response = await chatService.fetchChats();
-        setConversations(response.result);
+        const response = await friendRequestService.getFriends();
+        setConversations(response.friends);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching conversations:", error);
       }
     };
 
-    fetchConversations();
+    fetchFriends();
   }, []);
 
   const handleConversationClick = (chatId, userId) => {
     navigate(`/home/chat/${chatId}`);
-  };
-
-  const handleSearchChange = async (event) => {
-    setSearchQuery(event.target.value);
-    try {
-      const results = await userSvc.searchUsers(searchQuery);
-      setSearchResults(results);
-    } catch (error) {
-      console.error("Error searching users:", error);
-    }
   };
 
   return (
@@ -69,36 +57,11 @@ const Chat = () => {
             </div>
 
             <div className="chat-sidebar w-full px-2">
-              <input
-                type="text"
-                placeholder="Search users..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="p-2 rounded-md border border-gray-300"
-              />
-              {searchResults.length > 0 && (
-                <ul className="absolute bg-white border border-gray-300 rounded-md mt-1 w-[50%]">
-                  {searchResults.map((user) => (
-                    <li
-                      key={user.id}
-                      className="py-2 px-4 hover:bg-gray-100 flex items-center justify-between cursor-pointer"
-                      onClick={() => handleConversationClick(user.id)}
-                    >
-                      <span className="text-lg font-bold">
-                        {user.firstName} {user.lastName}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
               {conversations.map((conversation, index) => (
                 <div
                   key={index}
                   onClick={() =>
-                    handleConversationClick(
-                      conversation.id,
-                      conversation.users[0].id
-                    )
+                    handleConversationClick(conversation.id, conversation.id)
                   }
                   className="cursor-pointer"
                 >
@@ -107,10 +70,10 @@ const Chat = () => {
                       <div className="w-12 h-12 rounded-full overflow-hidden">
                         <img
                           src={
-                            conversation.users[0]?.profilePic
+                            conversation.profilePic
                               ? `${
                                   import.meta.env.VITE_IMAGE_URL
-                                }/${conversation.users[0]?.profilePic.replace(
+                                }/${conversation.profilePic.replace(
                                   /\\/g,
                                   "/"
                                 )}`
@@ -122,9 +85,7 @@ const Chat = () => {
                       </div>
                       <div className="flex-1">
                         <h6 className="font-semibold text-lg">
-                          {conversation.isGroupChat && conversation.chatName
-                            ? conversation.chatName
-                            : `${conversation.users[0]?.firstName} ${conversation.users[0]?.lastName}`}
+                          {conversation.firstName} {conversation.lastName}
                         </h6>
                         <p className="text-sm">{conversation.latestMessage}</p>
                       </div>

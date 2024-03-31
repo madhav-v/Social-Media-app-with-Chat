@@ -5,6 +5,7 @@ import { User } from "../models/User.model";
 import { CustomRequest } from "../middlewares/auth.middleware";
 import ErrorHandler from "../utils/errorhandler";
 import logger from "../config/logger";
+import { io } from "../config/socket";
 
 export class FriendRequestController {
   sendFriendRequest = async (req: CustomRequest, res: Response) => {
@@ -36,13 +37,15 @@ export class FriendRequestController {
       }
 
       const friendRequest = friendRequestRepository.create({
-        sender: req.user,
+        sender: { id: req.user.id },
         recipient,
         status: "pending",
         createdAt: new Date(),
         updatedAt: new Date(),
       });
       await friendRequestRepository.save(friendRequest);
+
+      io.emit("newFriendrequest", { recipientId });
 
       res.status(200).send("Friend request sent successfully");
     } catch (error: any) {
@@ -78,6 +81,8 @@ export class FriendRequestController {
 
       friendRequest.status = "accepted";
       await friendRequestRepository.save(friendRequest);
+
+      io.emit("friendRequestAccepted", { requestId });
 
       res.status(200).send("Friend request accepted successfully");
     } catch (error: any) {

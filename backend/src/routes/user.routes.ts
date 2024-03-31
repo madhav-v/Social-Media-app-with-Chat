@@ -21,5 +21,6 @@ router.post(
 );
 router.get("/me", checkAuth, userCtrl.getLoggedInUser);
 router.get("/search", checkAuth, userCtrl.searchUser);
+router.get("/all", checkAuth, userCtrl.getUsers);
 
 export default router;

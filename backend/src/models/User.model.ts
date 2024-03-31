@@ -5,7 +5,9 @@ import {
   Column,
   OneToOne,
   JoinColumn,
+  ManyToMany,
 } from "typeorm";
+import { Chat } from "./Chat.model";
 
 @Entity()
 export class User {

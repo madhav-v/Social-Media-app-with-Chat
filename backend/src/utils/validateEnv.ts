@@ -8,4 +8,5 @@ dotenv.config({ path: envFilePath });
 export default cleanEnv(process.env, {
   PORT: port(),
   JWT_SECRET: str(),
+  CLIENT_URL: str()
 });

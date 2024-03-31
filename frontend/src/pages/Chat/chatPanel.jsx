@@ -1,30 +1,74 @@
 import React, { useEffect, useState, useRef } from "react";
 import { MdSend } from "react-icons/md";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import chatService from "../../services/chat.service";
+import { RiSendPlaneFill } from "react-icons/ri";
+import userSvc from "../../services/user.service";
+import authSvc from "../../services/auth.service";
+import { formatDistanceToNow } from "date-fns";
 
 const ChatPanel = () => {
   const params = useParams();
   let id = params.id;
   const chatBoxRef = useRef(null);
-  const [newMessageContent, setNewMessageContent] = useState("");
   const [conversationMessages, setConversationMessages] = useState([]);
+  const [userId, setUserId] = useState();
+  const [chatId, setChatId] = useState();
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessageContent, setNewMessageContent] = useState("");
+
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const response = await chatService.accessChat({ userId: id });
-        console.log(response);
-        setConversationMessages(response);
+        // console.log("response", response);
+        // setConversationMessages(response);
+        setChatId(response.id);
         scrollToBottom();
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
     };
 
+    const getLoggedInUser = async () => {
+      try {
+        const response = await authSvc.getLoggedInUser();
+        setUserId(response.data.id);
+      } catch (error) {
+        console.error("Error fetching logged-in user:", error);
+      }
+    };
+
+    const getUserById = async () => {
+      try {
+        const response = await authSvc.getUserById(id);
+        // console.log("response", response);
+        setConversationMessages(response.user);
+        scrollToBottom();
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+
+    getLoggedInUser();
     fetchMessages();
+    getUserById();
   }, [id]);
+  const getMessages = async () => {
+    try {
+      if (chatId) {
+        const response = await chatService.getMessages(chatId);
+        setMessages(response);
+        scrollToBottom();
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
+
+  useEffect(() => {
+    getMessages();
+  }, [chatId]);
 
   const scrollToBottom = () => {
     if (chatBoxRef.current) {
@@ -32,86 +76,111 @@ const ChatPanel = () => {
     }
   };
 
-  // const sendMessage = async () => {
-  //   if (newMessageContent.trim() !== "") {
-  //     try {
-  //       await chatService.accessChat({
-  //         userId: id,
-  //         content: newMessageContent,
-  //       });
-  //       const newMessage = {
-  //         id: conversationMessages.length + 1,
-  //         content: newMessageContent,
-  //         sender: "You",
-  //         timestamp: new Date().toLocaleTimeString(),
-  //       };
-  //       setConversationMessages([...conversationMessages, newMessage]);
-  //       scrollToBottom();
-  //       setNewMessageContent("");
-  //     } catch (error) {
-  //       console.error("Error sending message:", error);
-  //     }
-  //   }
-  // };
-
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await chatService.getMessages(id); // Fetch messages for the selected chat id
-        setMessages(response);
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-      }
-    };
-
-    fetchMessages();
-  }, [id]); // Fetch messages when chat id changes
-  console.log("messages", messages);
   const sendMessage = async () => {
     try {
-      await chatService.sendMessage(id, newMessage); // Send message to the selected chat id
-      setNewMessage(""); // Clear the input field after sending message
+      console.log(newMessageContent);
+
+      let content = newMessageContent.trim();
+      let data = { chatId, content };
+      let response = await chatService.sendMessage(data);
+      console.log("message response", response);
+      setNewMessageContent("");
+      getMessages();
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
-
+  // console.log("chatid0", chatId);
+  // console.log("messages", messages);
   return (
     <div className="w-[70%] ml-[30%] min-h-[90vh] md:h-full rounded-xl overflow-hidden relative md:rounded-tl-none md:rounded-bl-none">
       <div className="w-full h-full">
-        {/* Chat content */}
-        <div ref={chatBoxRef} className="w-full h-[72vh] overflow-y-auto p-4">
-          {/* {conversationMessages.map((message) => (
-            <div key={message.id} className="mb-4">
-              <div className="font-semibold">{message.sender}</div>
-              <div>{message.content}</div>
-              <div className="text-sm text-gray-500">{message.timestamp}</div>
+        <div className="flex justify-between items-center border-b-[1px] border-[rgba(0, 0, 0, 0.7)]">
+          <div className="px-2 flex items-center justify-center basis-1/3">
+            <div className="relative w-[50px] h-[50px] md:w-[70px] md:h-[70px]  rounded-[50%] ml-[-30%]">
+              <img
+                src={
+                  conversationMessages && conversationMessages?.profilePic
+                    ? `${
+                        import.meta.env.VITE_IMAGE_URL
+                      }/${conversationMessages?.profilePic.replace(/\\/g, "/")}`
+                    : "https://via.placeholder.com/150"
+                }
+                className="w-full h-full object-cover object-center rounded-[50%]"
+                alt="chat-profile"
+              />
             </div>
-          ))} */}
-          {messages &&
-            messages.map((message, index) => (
-              <div key={index} className="message">
-                <p>{message.content}</p>
-                {/* Add more details like sender, timestamp, etc. if needed */}
-              </div>
-            ))}
+            <div className="">
+              <Link
+                to={`/home/friends/${
+                  conversationMessages && conversationMessages?.id
+                }`}
+              >
+                <div className="flex items-center ml-2">
+                  <p className="ml-2 text-lg">
+                    {conversationMessages && conversationMessages?.firstName}{" "}
+                    {conversationMessages && conversationMessages?.lastName}
+                  </p>
+                </div>
+              </Link>
+            </div>
+          </div>
         </div>
-        {/* Input field to send messages */}
+        <div className="w-full h-[72vh]">
+          <div className="chat-box w-full h-full flex flex-col-reverse overflow-y-auto">
+            {messages
+              .slice(0)
+              .reverse()
+              .map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${
+                    message.sender.id === userId
+                      ? "justify-end"
+                      : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`p-2 mb-2 rounded-lg max-w-[70%] ${
+                      message.sender.id === userId
+                        ? "bg-red-500 text-white"
+                        : "bg-red-500 ml-3 text-white"
+                    }`}
+                  >
+                    <p>{message.content}</p>
+                    <div className="flex justify-between items-center mt-1">
+                      <p className="text-xs text-black">
+                        {formatDistanceToNow(new Date(message.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </p>
+                      {/* Add additional content here */}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+
         <div className="chat-write absolute bg-screen bottom-2 left-0 mb-3 w-full flex items-center ml-1">
           <input
             type="text"
             placeholder="Send a message"
             value={newMessageContent}
             onChange={(e) => setNewMessageContent(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                sendMessage();
+              }
+            }}
             className="w-full border p-2 pt-2 bg-white text-lg rounded-3xl align-middle bg-screen"
           />
-          {/* Send button */}
-          <button
+          <span
             onClick={sendMessage}
             className="ml-2 p-2 bg-red-500 text-white rounded-full cursor-pointer mr-4 hover:bg-red-700"
           >
-            <MdSend className="text-xl" />
-          </button>
+            <RiSendPlaneFill className="text-xl" />
+          </span>
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import {
   JoinColumn,
   OneToOne,
   JoinTable,
+  OneToMany,
 } from "typeorm";
 import { User } from "./User.model";
 import { Message } from "./Message.model";
@@ -30,7 +31,6 @@ export class Chat {
   @JoinColumn()
   groupAdmin: User;
 
-  @ManyToOne(() => Message)
-  // @JoinColumn({ name: "latestMessageId" })
-  latestMessage: Message;
+  @OneToMany(() => Message, (message) => message.chat)
+  messages: Message[];
 }

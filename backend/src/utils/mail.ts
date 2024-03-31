@@ -1,9 +1,10 @@
-const dotenv = require("dotenv");
+import dotenv from "dotenv";
+import nodemailer from "nodemailer";
+
 dotenv.config();
-const nodemailer = require("nodemailer");
 
 class MailService {
-  connection;
+  connection: any; // Adjust the type according to nodemailer.createTransport return type
   constructor() {
     this.connection = nodemailer.createTransport({
       service: "gmail",
@@ -11,12 +12,17 @@ class MailService {
       port: 587,
       secure: false,
       auth: {
-        user: "madhavdhungana36@getMaxListeners.com",
+        user: "madhavdhungana36@gmail.com",
         pass: "dwdi dejm wgmy vsze",
       },
     });
   }
-  sendMail = async (to: string, subject: string, content: string) => {
+
+  sendMail = async (
+    to: string,
+    subject: string,
+    content: string
+  ): Promise<boolean> => {
     try {
       let msg = {
         from: "Admin User",
@@ -24,14 +30,18 @@ class MailService {
         subject: subject,
         html: content,
       };
+      console.log(msg);
 
       let response = await this.connection.sendMail(msg);
+      console.log(response);
+
       return true;
     } catch (exception) {
       console.log("Email Exception", exception);
+      return false;
     }
   };
 }
 
 const mailSvc = new MailService();
-module.exports = mailSvc;
+export default mailSvc;

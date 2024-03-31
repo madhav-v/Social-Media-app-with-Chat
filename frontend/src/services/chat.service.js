@@ -104,6 +104,17 @@ class ChatService extends HttpService {
       throw error;
     }
   };
+
+  getMessages = async (chatId) => {
+    try {
+      const response = await this.getRequest(`/v1/message/${chatId}`, {
+        auth: true,
+      });
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
 }
 
 const chatService = new ChatService();

@@ -16,6 +16,7 @@ import Chat from "./pages/Chat";
 import ChatPanel from "./pages/Chat/chatPanel";
 import Friends from "./pages/Friends";
 import FriendProfile from "./pages/Friends/friendProfile";
+import ResetPassword from "./pages/ForgetPassword/forgetPassword";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgetPassword" element={<ResetPassword />} />
         <Route path="/home" element={<InnerLayout />}>
           <Route index element={<DashBoard />} />
           <Route path="profile" element={<Profile />} />

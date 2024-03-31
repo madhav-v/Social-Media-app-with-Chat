@@ -23,15 +23,17 @@ export class ChatController {
       const requestedUserID = userId;
       const existingChat = await chatRepo
         .createQueryBuilder("chat")
-        .leftJoinAndSelect("chat.users", "users")
+        .leftJoin("chat.users", "user")
         .where("chat.isGroupChat = :isGroupChat", { isGroupChat: false })
-        .andWhere("users.id IN (:...userIDs)", {
-          userIDs: [currentUserID, requestedUserID],
+        .andWhere("user.id IN (:currentUserID, :requestedUserID)", {
+          currentUserID: req.user.id,
+          requestedUserID: userId,
         })
         .groupBy("chat.id")
-        .addGroupBy("users.id") // Include users.id in the GROUP BY clause
         .having("COUNT(chat.id) = 2") // Ensure there are exactly two users in the chat
         .getOne();
+
+      console.log("existing ", existingChat);
 
       if (existingChat) {
         res.send(existingChat);
@@ -47,7 +49,7 @@ export class ChatController {
 
         const fullChat = await chatRepo.findOne({
           where: { id: newChat.id },
-          relations: ["users", "latestMessage"],
+          relations: ["users", "messages"],
         });
         console.log(fullChat);
 
@@ -64,19 +66,20 @@ export class ChatController {
 
   fetchChats = async (req: CustomRequest, res: Response) => {
     try {
+      const userId = req.user.id;
       const chatRepo = getRepository(Chat);
 
-      const chats = await chatRepo.find({
+      const chats = await chatRepo.findOne({
         where: {
           users: req.user.id,
         },
-        relations: ["users", "latestMessage"],
+        relations: ["users", "messages"],
         order: { id: "DESC" },
       });
-
-      res.status(200).json({
-        result: chats,
-      });
+      // const userChats = chats.filter((chat) =>
+      //   chat.users.some((user) => user.id === userId)
+      // );
+      res.status(200).json({ data: chats });
     } catch (error: any) {
       const statusCode = error.statusCode || 500;
       const message = error.message || "An error occurred";

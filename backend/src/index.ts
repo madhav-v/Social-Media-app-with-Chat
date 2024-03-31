@@ -8,6 +8,7 @@ import cors from "cors";
 import { FriendRequest } from "./models/FriendRequest.model";
 import { Chat } from "./models/Chat.model";
 import { Message } from "./models/Message.model";
+import { httpServer } from "./config/socket";
 
 const app = express();
 app.use(express.json());
@@ -36,7 +37,7 @@ createConnection({
 })
   .then(() => {
     console.log("Database connected");
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   })

@@ -8,6 +8,7 @@ const authCtrl = new AuthController();
 //Authentication
 router.post("/register", authCtrl.register);
 router.post("/login", authCtrl.login);
+router.post("/forgetPassword", authCtrl.forgetPassword);
+router.post("/resetPassword", authCtrl.resetPassword);
 router.get("/:id", checkAuth, authCtrl.getUserById);
-
 export default router;

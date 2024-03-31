@@ -5,6 +5,7 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  Index,
 } from "typeorm";
 import { Chat } from "./Chat.model";
 import { User } from "./User.model";
@@ -19,7 +20,7 @@ export class Message {
   chat: Chat;
 
   @ManyToOne(() => User)
-  // @JoinColumn()
+  @JoinColumn()
   sender: User;
 
   @Column({ nullable: true })
@@ -29,8 +30,7 @@ export class Message {
   images: string[];
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  @Index()
   createdAt: Date;
 
-  // @ManyToOne(() => User)
-  // readBy: User[];
 }
