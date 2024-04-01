@@ -33,7 +33,6 @@ class MailService {
       console.log(msg);
 
       let response = await this.connection.sendMail(msg);
-      console.log(response);
 
       return true;
     } catch (exception) {

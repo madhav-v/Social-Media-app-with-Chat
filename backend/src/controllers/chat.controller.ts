@@ -15,8 +15,6 @@ export class ChatController {
         throw new ErrorHandler("UserId not send with request", 400);
       }
 
-      console.log("req", req.user.id);
-
       const chatRepo = getRepository(Chat);
       const userRepo = getRepository(User);
       const currentUserID = req.user.id;
@@ -32,8 +30,6 @@ export class ChatController {
         .groupBy("chat.id")
         .having("COUNT(chat.id) = 2") // Ensure there are exactly two users in the chat
         .getOne();
-
-      console.log("existing ", existingChat);
 
       if (existingChat) {
         res.send(existingChat);
@@ -217,6 +213,48 @@ export class ChatController {
       const message = error.message || "An error occurred";
       const err = new ErrorHandler(message, statusCode);
       logger.error(`Error adding user to group chat: ${message}`, error);
+      res.status(statusCode).json({ error: err.message });
+    }
+  };
+
+  getGroupChats = async (req: CustomRequest, res: Response) => {
+    try {
+      const chatRepo = getRepository(Chat);
+      const userId = req.user.id;
+      const groupChats = await chatRepo
+        .createQueryBuilder("chat")
+        .innerJoin("chat.users", "user", "user.id = :userId", { userId })
+        .where("chat.isGroupChat = true")
+        .leftJoinAndSelect("chat.users", "users")
+        .leftJoinAndSelect("chat.groupAdmin", "groupAdmin")
+        .getMany();
+      res.json(groupChats);
+    } catch (error: any) {
+      const statusCode = error.statusCode || 500;
+      const message = error.message || "An error occurred";
+      const err = new ErrorHandler(message, statusCode);
+      logger.error(`Error fetching group chats: ${message}`, error);
+      res.status(statusCode).json({ error: err.message });
+    }
+  };
+
+  getGroupChatById = async (req: CustomRequest, res: Response) => {
+    try {
+      const chatId = parseInt(req.params.id);
+      const chatRepo = getRepository(Chat);
+      const chat = await chatRepo.findOne({
+        where: { id: chatId },
+        relations: ["users", "messages", "groupAdmin"],
+      });
+      if (!chat) {
+        throw new ErrorHandler("Chat not found", 404);
+      }
+      res.json(chat);
+    } catch (exception: any) {
+      const statusCode = exception.statusCode || 500;
+      const message = exception.message || "An error occurred";
+      const err = new ErrorHandler(message, statusCode);
+      logger.error(`Error fetching group chat by id: ${message}`, exception);
       res.status(statusCode).json({ error: err.message });
     }
   };

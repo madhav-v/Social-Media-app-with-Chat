@@ -128,7 +128,6 @@ export class AuthController {
   forgetPassword = async (req: Request, res: Response) => {
     try {
       const { email } = req.body;
-      console.log(email);
 
       if (!email) {
         throw new ErrorHandler("Email is required", 400);

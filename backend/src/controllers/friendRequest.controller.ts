@@ -80,11 +80,14 @@ export class FriendRequestController {
       // }
 
       friendRequest.status = "accepted";
-      await friendRequestRepository.save(friendRequest);
+      let data = await friendRequestRepository.save(friendRequest);
 
       io.emit("friendRequestAccepted", { requestId });
 
-      res.status(200).send("Friend request accepted successfully");
+      res.status(200).json({
+        message: "Friend request accepted successfully",
+        data: data,
+      });
     } catch (error: any) {
       const statusCode = error.statusCode || 500;
       const message = error.message || "An error occurred";

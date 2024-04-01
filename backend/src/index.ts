@@ -9,6 +9,7 @@ import { FriendRequest } from "./models/FriendRequest.model";
 import { Chat } from "./models/Chat.model";
 import { Message } from "./models/Message.model";
 import { httpServer } from "./config/socket";
+import { Comment } from "./models/Comment.model";
 
 const app = express();
 app.use(express.json());
@@ -31,13 +32,13 @@ createConnection({
   username: "postgres",
   password: "madhav2058",
   database: "Social",
-  entities: [User, Post, FriendRequest, Chat, Message],
+  entities: [User, Post, FriendRequest, Chat, Message, Comment],
   synchronize: true,
   // logging: true,
 })
   .then(() => {
     console.log("Database connected");
-    httpServer.listen(PORT, () => {
+    app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   })

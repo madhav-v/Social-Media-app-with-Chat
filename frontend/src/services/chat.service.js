@@ -83,22 +83,17 @@ class ChatService extends HttpService {
         auth: true,
       });
       return response;
-    } catch (errpr) {
+    } catch (error) {
       throw error;
     }
   };
 
-  sendMessage = async (chatId, messageContent) => {
+  sendMessage = async (chatId, data) => {
     try {
-      const response = await this.postRequest(
-        `/v1/message`,
-        chatId,
-        { content: messageContent },
-        {
-          auth: true,
-          file: false,
-        }
-      );
+      const response = await this.postRequest(`/v1/message`, chatId, data, {
+        auth: true,
+        file: true,
+      });
       return response;
     } catch (error) {
       throw error;

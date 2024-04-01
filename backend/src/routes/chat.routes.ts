@@ -11,6 +11,7 @@ router.post("/createGroup", checkAuth, chatController.createGroupChat);
 router.put("/rename", checkAuth, chatController.renameGroup);
 router.put("/addToGroup", checkAuth, chatController.addToGroup);
 router.put("/removeFromGroup", checkAuth, chatController.removeFromGroup);
+router.get("/getGroup", checkAuth, chatController.getGroupChats);
+router.get("/group/:id", checkAuth, chatController.getGroupChatById);
 
 export default router;
-

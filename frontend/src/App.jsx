@@ -17,6 +17,10 @@ import ChatPanel from "./pages/Chat/chatPanel";
 import Friends from "./pages/Friends";
 import FriendProfile from "./pages/Friends/friendProfile";
 import ResetPassword from "./pages/ForgetPassword/forgetPassword";
+import SetPassword from "./pages/ForgetPassword/setPassword";
+import GroupChat from "./pages/Chat/groupchat";
+import GroupLayout from "./pages/Chat/groupchat.layout";
+import GroupPanel from "./pages/Chat/groupchatPanel";
 
 function App() {
   return (
@@ -25,6 +29,7 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgetPassword" element={<ResetPassword />} />
+        <Route path="reset-password/:token" element={<SetPassword />} />
         <Route path="/home" element={<InnerLayout />}>
           <Route index element={<DashBoard />} />
           <Route path="profile" element={<Profile />} />
@@ -35,6 +40,10 @@ function App() {
           <Route path="chat" element={<ChatLayout />}>
             <Route index element={<Chat />} />
             <Route path=":id" element={<ChatPanel />} />
+          </Route>
+          <Route path="groupchat" element={<GroupLayout />}>
+            <Route index element={<GroupChat />} />
+            <Route path=":id" element={<GroupPanel />} />
           </Route>
         </Route>
 

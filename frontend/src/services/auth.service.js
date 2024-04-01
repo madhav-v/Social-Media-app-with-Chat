@@ -19,7 +19,6 @@ class AuthService {
     }
   }
 
-
   async getLoggedInUser() {
     try {
       const token = localStorage.getItem("token");
@@ -42,8 +41,8 @@ class AuthService {
   async forgetPassword(email) {
     try {
       const response = await axiosInstance.post(
-        "/v1/auth/forget-password",
-        { email: email },
+        "/v1/auth/forgetPassword",
+        email,
         {
           headers: {
             "Content-Type": "application/json",
@@ -56,23 +55,11 @@ class AuthService {
     }
   }
 
-  async resetPassword(userEmail, password) {
+  async resetPassword(data) {
     try {
-      const response = await axiosInstance.post(
-        "/v1/auth/password-reset",
-        { email: userEmail, password },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (response.status) {
-        return response.data;
-      } else {
-        throw new Error(response.data.msg);
-      }
+      const response = await axiosInstance.post("/v1/auth/resetPassword", data);
+
+      return response;
     } catch (error) {
       throw error;
     }

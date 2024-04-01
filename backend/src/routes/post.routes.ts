@@ -28,5 +28,7 @@ router.put(
 );
 
 router.get("/user/:id", checkAuth, postController.getPostsByUser);
+router.post("/:id/like", checkAuth, postController.likePost);
+router.post("/:id/comment", checkAuth, postController.commentPost);
 
 export default router;

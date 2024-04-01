@@ -7,12 +7,12 @@ const FriendProfile = () => {
   const { id } = useParams();
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [likes, setLikes] = useState([]);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const response = await authSvc.getUserById(id);
-        console.log(response);
         setUser(response.user);
       } catch (error) {
         console.log(error);
@@ -22,6 +22,7 @@ const FriendProfile = () => {
     const fetchUserPosts = async () => {
       try {
         const response = await postSvc.getPostByUser(id);
+        console.log(response);
         setPosts(response.data);
       } catch (error) {
         console.log(error);

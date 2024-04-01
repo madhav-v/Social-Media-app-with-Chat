@@ -5,8 +5,11 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from "typeorm";
 import { User } from "./User.model";
+import { Comment } from "./Comment.model";
 
 @Entity()
 export class Post {
@@ -22,4 +25,11 @@ export class Post {
   @ManyToOne(() => User)
   @JoinColumn()
   user: User;
+
+  @ManyToMany(() => User, { cascade: true })
+  @JoinTable()
+  likes: User[];
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comments: Comment[];
 }

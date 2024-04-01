@@ -51,7 +51,18 @@ const Chat = () => {
             <div className="w-full flex  flex-col justify-around relative">
               <div className="w-full flex justify-around ">
                 <div className="flex items-center justify-center hover:bg-screen px-3 py-2 rounded-xl">
-                  <span className={"font-bold xl:text-xl"}>Chat</span>
+                  <span
+                    onClick={() => navigate("/home/chat")}
+                    className={"font-bold xl:text-xl mr-10 cursor-pointer"}
+                  >
+                    Chat
+                  </span>
+                  <span
+                    onClick={() => navigate("/home/groupchat")}
+                    className={"font-bold xl:text-xl cursor-pointer"}
+                  >
+                    Group Chat
+                  </span>
                 </div>
               </div>
             </div>

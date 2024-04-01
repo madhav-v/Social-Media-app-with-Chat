@@ -3,19 +3,23 @@ import { MdSend } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
 import chatService from "../../services/chat.service";
 import { RiSendPlaneFill } from "react-icons/ri";
+
 import userSvc from "../../services/user.service";
 import authSvc from "../../services/auth.service";
 import { formatDistanceToNow } from "date-fns";
+import { FaRegImage } from "react-icons/fa";
 
 const ChatPanel = () => {
   const params = useParams();
   let id = params.id;
   const chatBoxRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [conversationMessages, setConversationMessages] = useState([]);
   const [userId, setUserId] = useState();
   const [chatId, setChatId] = useState();
   const [messages, setMessages] = useState([]);
   const [newMessageContent, setNewMessageContent] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -78,18 +82,29 @@ const ChatPanel = () => {
 
   const sendMessage = async () => {
     try {
-      console.log(newMessageContent);
-
       let content = newMessageContent.trim();
-      let data = { chatId, content };
+      let data = {
+        chatId,
+        content,
+        images: [],
+      };
+      if (selectedImage) {
+        let formData = new FormData();
+        formData.append("images", selectedImage);
+        data.images = formData;
+      }
+      console.log("img", data.images);
+      console.log("data", data);
       let response = await chatService.sendMessage(data);
       console.log("message response", response);
       setNewMessageContent("");
+      setSelectedImage(null);
       getMessages();
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
+  // console.log(selectedImage);
   // console.log("chatid0", chatId);
   // console.log("messages", messages);
   return (
@@ -147,7 +162,28 @@ const ChatPanel = () => {
                         : "bg-red-500 ml-3 text-white"
                     }`}
                   >
-                    <p>{message.content}</p>
+                    {message.images.length > 0 ? (
+                      <div className="max-w-[70%] h-[50%] mx-auto">
+                        <img
+                          src={`${
+                            import.meta.env.VITE_IMAGE_URL
+                          }/${message.images[0].replace(/\\/g, "/")}`}
+                          alt="Sent Image"
+                          className="rounded-lg w-[50%]"
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className={`mb-2 rounded-lg max-w-[70%] ${
+                          message.sender.id === userId
+                            ? "bg-red-500 text-white"
+                            : "bg-red-500 ml-3 text-white"
+                        }`}
+                      >
+                        <p>{message.content}</p>
+                      </div>
+                    )}
+
                     <div className="flex justify-between items-center mt-1">
                       <p className="text-xs text-black">
                         {formatDistanceToNow(new Date(message.createdAt), {
@@ -163,6 +199,31 @@ const ChatPanel = () => {
         </div>
 
         <div className="chat-write absolute bg-screen bottom-2 left-0 mb-3 w-full flex items-center ml-1">
+          <input
+            ref={fileInputRef}
+            id="fileInput"
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={(e) => {
+              if (e.target.files.length > 0) {
+                setSelectedImage(e.target.files[0]);
+                fileInputRef.current.value = "";
+              }
+            }}
+          />
+
+          {/* <span
+            onClick={() => fileInputRef.current.click()}
+            className="ml-2 p-2 bg-red-500 text-white rounded-full cursor-pointer hover:bg-red-700"
+          > */}
+          <label
+            htmlFor="fileInput"
+            className="ml-2 p-2 bg-red-500 text-white rounded-full cursor-pointer hover:bg-red-700"
+          >
+            <FaRegImage className="text-xl" />
+          </label>
+          {/* </span> */}
           <input
             type="text"
             placeholder="Send a message"
