@@ -53,13 +53,13 @@ const Chat = () => {
                 <div className="flex items-center justify-center hover:bg-screen px-3 py-2 rounded-xl">
                   <span
                     onClick={() => navigate("/home/chat")}
-                    className={"font-bold xl:text-xl mr-10 cursor-pointer"}
+                    className="font-bold xl:text-xl mr-10 cursor-pointer transition duration-300 hover:shadow-md hover:text-gray-800"
                   >
                     Chat
                   </span>
                   <span
                     onClick={() => navigate("/home/groupchat")}
-                    className={"font-bold xl:text-xl cursor-pointer"}
+                    className="font-bold xl:text-xl cursor-pointer transition duration-300 hover:shadow-md hover:text-gray-800"
                   >
                     Group Chat
                   </span>
@@ -98,7 +98,6 @@ const Chat = () => {
                         <h6 className="font-semibold text-lg">
                           {conversation.firstName} {conversation.lastName}
                         </h6>
-                        <p className="text-sm">{conversation.latestMessage}</p>
                       </div>
                     </div>
                   </div>

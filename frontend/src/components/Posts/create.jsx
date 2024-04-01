@@ -46,7 +46,7 @@ const CreatePost = () => {
       {!showForm && ( // Render the button/text if the form is not shown
         <button
           onClick={handleCreatePostClick}
-          className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+          className="bg-red-500 mx-a text-white py-2 px-4 rounded hover:bg-red-600"
         >
           Create Post
         </button>
