@@ -5,7 +5,7 @@ import { User } from "../models/User.model";
 import { CustomRequest } from "../middlewares/auth.middleware";
 import ErrorHandler from "../utils/errorhandler";
 import logger from "../config/logger";
-import { io } from "../config/socket";
+import httpServer from "../config/socket";
 
 export class FriendRequestController {
   sendFriendRequest = async (req: CustomRequest, res: Response) => {
@@ -45,9 +45,11 @@ export class FriendRequestController {
       });
       await friendRequestRepository.save(friendRequest);
 
-      io.emit("newFriendrequest", { recipientId });
-
-      res.status(200).send("Friend request sent successfully");
+      res.status(200).json({
+        request: friendRequest,
+        message: "Friend request sent successfully",
+      });
+      // httpServer.emit("friendRequestSent", recipientId);
     } catch (error: any) {
       const statusCode = error.statusCode || 500;
       const message = error.message || "An error occurred";
@@ -81,8 +83,6 @@ export class FriendRequestController {
 
       friendRequest.status = "accepted";
       let data = await friendRequestRepository.save(friendRequest);
-
-      io.emit("friendRequestAccepted", { requestId });
 
       res.status(200).json({
         message: "Friend request accepted successfully",

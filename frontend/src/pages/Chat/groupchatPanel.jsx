@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import groupSvc from "../../services/groupChat.service";
 import { useParams } from "react-router-dom";
 import { RiSendPlaneFill } from "react-icons/ri";
-import { FaEdit, FaRegImage } from "react-icons/fa";
+import { FaEdit, FaPlus, FaRegImage, FaTrash } from "react-icons/fa";
 import authSvc from "../../services/auth.service";
 import chatService from "../../services/chat.service";
 import { formatDistanceToNow } from "date-fns";
 import { MdCancel, MdDone } from "react-icons/md";
 import ToastAlert from "../../components/Toast";
+import { FaCircleInfo } from "react-icons/fa6";
 
 const GroupPanel = () => {
   const params = useParams();
@@ -21,7 +22,9 @@ const GroupPanel = () => {
   const [messages, setMessages] = useState([]);
   const [editingName, setEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
-
+  const [showMemberModal, setShowMemberModal] = useState(false);
+  const [groupMembers, setGroupMembers] = useState([]);
+  const [groupAdmin, setGroupAdmin] = useState();
   useEffect(() => {
     const getLoggedInUser = async () => {
       try {
@@ -81,8 +84,9 @@ const GroupPanel = () => {
       try {
         const response = await groupSvc.getGroupById(id);
 
-        // console.log(response);
+        setGroupAdmin(response.groupAdmin);
         setGroups(response);
+        setGroupMembers(response.users);
       } catch (error) {
         console.error("Error fetching group by id:", error);
       }
@@ -116,6 +120,30 @@ const GroupPanel = () => {
   useEffect(() => {
     getMessages();
   }, []);
+  console.log(groupMembers);
+  const handleRemoveMember = async (memberId) => {
+    try {
+      console.log(memberId);
+      // Implement remove member functionality
+      // const response = await groupSvc.removeMember(id, memberId);
+      // Update group members state
+      // setGroupMembers(response.members);
+      ToastAlert("success", "Member removed successfully");
+    } catch (error) {
+      console.error("Error removing member:", error);
+      ToastAlert("error", "Failed to remove member");
+    }
+  };
+
+  const handleAddMember = async () => {
+    try {
+      // Implement add member functionality
+      // Show add member dialog or input field
+    } catch (error) {
+      console.error("Error adding member:", error);
+      ToastAlert("error", "Failed to add member");
+    }
+  };
 
   return (
     <div className="w-[70%] ml-[30%] min-h-[90vh] md:h-full rounded-xl overflow-hidden relative md:rounded-tl-none md:rounded-bl-none">
@@ -153,6 +181,35 @@ const GroupPanel = () => {
               )}
             </div>
           </div>
+          <FaCircleInfo
+            size={25}
+            color="red"
+            className="mr-2 cursor-pointer"
+            onClick={() => setShowMemberModal(true)}
+          />
+          {showMemberModal && (
+            <div className="modal-overlay mr-5">
+              <div className="modal">
+                <span
+                  className="close cursor-pointer"
+                  onClick={() => setShowMemberModal(false)} // Close member modal
+                >
+                  <MdCancel size={20} color="red" className="m-1" />
+                </span>
+                <h2>Group Members :</h2>
+                <ul>
+                  {groupMembers.map((member) => (
+                    <li key={member.id}>
+                      <span>
+                        {member.firstName} {member.lastName}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <h3>Admin: {groupAdmin.firstName}</h3>
+              </div>
+            </div>
+          )}
         </div>
         <div className="w-full h-[72vh]">
           <div className="chat-box w-full h-full flex flex-col-reverse overflow-y-auto">

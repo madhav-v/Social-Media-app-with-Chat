@@ -6,10 +6,17 @@ import logger from "../config/logger";
 // import { Profile } from "../models/Profile.Model";
 import { User } from "../models/User.model";
 import { Comment } from "../models/Comment.model";
+import { Server } from "socket.io";
+import { createServer } from "http";
+import { Server as ExpressServer } from "http";
+import express from "express";
 
 interface CustomRequest extends Request {
   user?: any;
 }
+const app = express();
+const server: ExpressServer = createServer(app); // Create HTTP server instance
+const io = new Server(server);
 
 export class PostController {
   createPost = async (req: CustomRequest, res: Response) => {
@@ -235,6 +242,11 @@ export class PostController {
 
       post.likes.push(req.user);
       let liked = await postRepository.save(post);
+      let data = {
+        postId: postId,
+        userId: userId,
+      };
+      io.emit("like", data);
 
       res.status(200).json({ message: "Post liked successfully", post: liked });
     } catch (error: any) {
@@ -272,6 +284,12 @@ export class PostController {
 
       await commentRepository.save(comment);
 
+      io.emit("comment", {
+        commentId: comment.id,
+        postId: postId,
+        content: content,
+        userId: req.user.id,
+      });
       res.status(201).json(comment);
     } catch (error: any) {
       const statusCode = error.statusCode || 500;

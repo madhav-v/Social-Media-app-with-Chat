@@ -21,6 +21,7 @@ import SetPassword from "./pages/ForgetPassword/setPassword";
 import GroupChat from "./pages/Chat/groupchat";
 import GroupLayout from "./pages/Chat/groupchat.layout";
 import GroupPanel from "./pages/Chat/groupchatPanel";
+import Notification from "./pages/Notification";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path="friendRequest" element={<Connection />} />
           <Route path="friends" element={<Friends />} />
           <Route path="friends/:id" element={<FriendProfile />} />
+          <Route path="notification" element={<Notification />} />
           <Route path="chat" element={<ChatLayout />}>
             <Route index element={<Chat />} />
             <Route path=":id" element={<ChatPanel />} />

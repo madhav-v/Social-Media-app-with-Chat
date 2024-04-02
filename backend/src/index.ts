@@ -2,14 +2,14 @@ import express from "express";
 import { createConnection } from "typeorm";
 import { User } from "./models/User.model";
 import routes from "./routes";
-// import { Profile } from "./models/Profile.Model";
 import { Post } from "./models/Post.model";
 import cors from "cors";
 import { FriendRequest } from "./models/FriendRequest.model";
 import { Chat } from "./models/Chat.model";
 import { Message } from "./models/Message.model";
-import { httpServer } from "./config/socket";
 import { Comment } from "./models/Comment.model";
+import http from "http";
+import { Server, Socket } from "socket.io";
 
 const app = express();
 app.use(express.json());
@@ -25,6 +25,33 @@ app.use("/api/v1", routes);
 
 const PORT = 3005;
 
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket: Socket) => {
+  console.log("A user connected");
+
+  socket.on("like", (data) => {
+    socket.broadcast.emit("like", data);
+  });
+
+  socket.on("comment", (data) => {
+    console.log(data);
+
+    socket.broadcast.emit("comment", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
+
 createConnection({
   type: "postgres",
   host: "localhost",
@@ -38,7 +65,8 @@ createConnection({
 })
   .then(() => {
     console.log("Database connected");
-    app.listen(PORT, () => {
+
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   })
