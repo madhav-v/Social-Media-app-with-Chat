@@ -22,8 +22,8 @@ export class FriendRequestController {
       if (!recipient) {
         return res.status(404).send("Recipient not found");
       }
-
       const friendRequestRepository = getRepository(FriendRequest);
+
       const existingRequest = await friendRequestRepository.findOne({
         where: {
           sender: { id: id },
@@ -49,7 +49,6 @@ export class FriendRequestController {
         request: friendRequest,
         message: "Friend request sent successfully",
       });
-      // httpServer.emit("friendRequestSent", recipientId);
     } catch (error: any) {
       const statusCode = error.statusCode || 500;
       const message = error.message || "An error occurred";

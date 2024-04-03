@@ -1,5 +1,5 @@
 import express from "express";
-import { createConnection } from "typeorm";
+import { createConnection, getRepository } from "typeorm";
 import { User } from "./models/User.model";
 import routes from "./routes";
 import { Post } from "./models/Post.model";
@@ -10,6 +10,7 @@ import { Message } from "./models/Message.model";
 import { Comment } from "./models/Comment.model";
 import http from "http";
 import { Server, Socket } from "socket.io";
+import { Notification } from "./models/Notification.model";
 
 const app = express();
 app.use(express.json());
@@ -34,14 +35,19 @@ const io = new Server(server, {
   },
 });
 
+const withObject = {};
+const withArray = [];
+
 io.on("connection", (socket: Socket) => {
-  console.log("A user connected");
+  const user = { socket: socket };
+
+  console.log("A user connected", socket.id);
 
   socket.on("like", (data) => {
     socket.broadcast.emit("like", data);
   });
 
-  socket.on("comment", (data) => {
+  socket.on("comment", async (data) => {
     console.log(data);
 
     socket.broadcast.emit("comment", data);
@@ -59,7 +65,7 @@ createConnection({
   username: "postgres",
   password: "madhav2058",
   database: "Social",
-  entities: [User, Post, FriendRequest, Chat, Message, Comment],
+  entities: [User, Post, FriendRequest, Chat, Message, Comment, Notification],
   synchronize: true,
   // logging: true,
 })

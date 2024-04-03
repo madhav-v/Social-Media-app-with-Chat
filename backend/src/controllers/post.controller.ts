@@ -3,20 +3,13 @@ import ErrorHandler from "../utils/errorhandler";
 import { Not, getRepository } from "typeorm";
 import { Post } from "../models/Post.model";
 import logger from "../config/logger";
-// import { Profile } from "../models/Profile.Model";
 import { User } from "../models/User.model";
 import { Comment } from "../models/Comment.model";
-import { Server } from "socket.io";
-import { createServer } from "http";
-import { Server as ExpressServer } from "http";
-import express from "express";
+import notificationCtrl from "./notification.controller";
 
 interface CustomRequest extends Request {
   user?: any;
 }
-const app = express();
-const server: ExpressServer = createServer(app); // Create HTTP server instance
-const io = new Server(server);
 
 export class PostController {
   createPost = async (req: CustomRequest, res: Response) => {
@@ -136,7 +129,7 @@ export class PostController {
       if (req.files && Array.isArray(req.files)) {
         media = req.files
           .map((file: Express.Multer.File) => file.path)
-          .join(","); // Join media paths into a single string
+          .join(",");
       }
 
       const postRepository = getRepository(Post);
@@ -228,7 +221,7 @@ export class PostController {
       const postRepository = getRepository(Post);
       const post = await postRepository.findOne({
         where: { id: postId },
-        relations: ["likes"],
+        relations: ["likes", "user"],
       });
       if (!post) {
         throw new ErrorHandler("Post not found", 404);
@@ -241,14 +234,18 @@ export class PostController {
       }
 
       post.likes.push(req.user);
-      let liked = await postRepository.save(post);
-      let data = {
-        postId: postId,
-        userId: userId,
-      };
-      io.emit("like", data);
+      let likedPost = await postRepository.save(post);
 
-      res.status(200).json({ message: "Post liked successfully", post: liked });
+      await notificationCtrl.createNotification(
+        post.user,
+        req.user,
+        post,
+        "like"
+      );
+
+      res
+        .status(200)
+        .json({ message: "Post liked successfully", post: likedPost });
     } catch (error: any) {
       const statusCode = error.statusCode || 500;
       const message = error.message || "An error occurred";
@@ -269,6 +266,7 @@ export class PostController {
       const postRepository = getRepository(Post);
       const post = await postRepository.findOne({
         where: { id: postId },
+        relations: ["user"],
       });
 
       if (!post) {
@@ -284,12 +282,13 @@ export class PostController {
 
       await commentRepository.save(comment);
 
-      io.emit("comment", {
-        commentId: comment.id,
-        postId: postId,
-        content: content,
-        userId: req.user.id,
-      });
+      await notificationCtrl.createNotification(
+        post.user,
+        req.user,
+        post,
+        "comment"
+      );
+
       res.status(201).json(comment);
     } catch (error: any) {
       const statusCode = error.statusCode || 500;

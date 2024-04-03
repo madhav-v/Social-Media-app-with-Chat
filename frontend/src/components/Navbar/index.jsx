@@ -8,6 +8,7 @@ import { useState } from "react";
 import ToastAlert from "../Toast";
 import userSvc from "../../services/user.service";
 import friendRequestService from "../../services/friendRequest.service"; // Import the friend request service
+import logo from "/dosti.png";
 
 const NavBar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -55,7 +56,7 @@ const NavBar = () => {
       <header className="bg-red-500 z-50 shadow-sm flex justify-between items-center md:fixed w-full left-0 top-0 h-20">
         <div className="basis-1/2 flex justify-start items-center">
           <NavLink className="navbar-logo basis-1/3" to="/home">
-            <img src="" alt="logo" className="w-20 ml-7 rounded-[40%]" />
+            <img src={logo} alt="logo" className="w-20 ml-7 rounded-[40%]" />
           </NavLink>
           <div className="ml-auto basis-1/2 text-white text-lg font-bold">
             Social Media App

@@ -72,7 +72,7 @@ const ChatPanel = () => {
 
   useEffect(() => {
     getMessages();
-  }, [chatId]);
+  }, [chatId, messages]);
 
   const scrollToBottom = () => {
     if (chatBoxRef.current) {
