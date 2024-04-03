@@ -32,6 +32,8 @@ const RegisterPage = () => {
       setIsLoading(false);
       ToastAlert("error", "Something Went Wrong");
       throw exception;
+    } finally {
+      setIsLoading(false);
     }
   };
 

@@ -4,11 +4,13 @@ import { Link } from "react-router-dom";
 import { FaCommentDots, FaHeart } from "react-icons/fa";
 import ToastAlert from "../Toast";
 import { IoIosShareAlt } from "react-icons/io";
+import { formatDistanceToNow } from "date-fns";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
   const [commentText, setCommentText] = useState("");
+  const [likes, setLikes] = useState(null);
 
   const allPosts = async () => {
     try {
@@ -21,8 +23,9 @@ const Posts = () => {
 
   const handleLike = async (postId) => {
     try {
-      console.log(postId);
       const likesResponse = await postSvc.likePost(postId);
+
+      setLikes(likesResponse.post.likes.length);
       if (!likesResponse) {
         ToastAlert("error", "You already liked post");
       } else {
@@ -55,88 +58,97 @@ const Posts = () => {
 
   useEffect(() => {
     allPosts();
-  }, [posts]);
+  }, [commentText, likes]);
 
   return (
     <>
-      {posts.map((post) => (
-        <div
-          key={post.id}
-          className="bg-white rounded-lg shadow-lg w-[50%] p-4 mb-4 mx-auto"
-        >
-          <div className="flex items-center mb-2">
-            <img
-              className="w-8 h-8 rounded-full mr-2"
-              src={
-                post?.user.profilePic
-                  ? `${
-                      import.meta.env.VITE_IMAGE_URL
-                    }/${post.user.profilePic.replace(/\\/g, "/")}`
-                  : "https://www.caltrain.com/files/images/2021-09/default.jpg"
-              }
-              alt="Profile picture"
-            />
-            <Link to={`/home/friends/${post.user.id}`}>
-              <span className="font-bold">
-                {post.user?.firstName} {post.user?.lastName}
+      {posts
+        .slice(0)
+        .reverse()
+        .map((post) => (
+          <div
+            key={post.id}
+            className="bg-white rounded-lg shadow-lg w-[50%] p-4 mb-4 mx-auto"
+          >
+            <div className="flex items-center mb-2">
+              <img
+                className="w-8 h-8 rounded-full mr-2"
+                src={
+                  post?.user.profilePic
+                    ? `${
+                        import.meta.env.VITE_IMAGE_URL
+                      }/${post.user.profilePic.replace(/\\/g, "/")}`
+                    : "https://www.caltrain.com/files/images/2021-09/default.jpg"
+                }
+                alt="Profile picture"
+              />
+              <Link to={`/home/friends/${post.user.id}`}>
+                <span className="font-bold">
+                  {post.user?.firstName} {post.user?.lastName}
+                </span>
+              </Link>
+              <span className="ml-2">
+                {post.createdAt &&
+                  formatDistanceToNow(new Date(post.createdAt), {
+                    addSuffix: true,
+                  })}
               </span>
-            </Link>
-          </div>
-          <p className="text-base leading-loose mb-2">{post.content}</p>
-          {post.media.map((media, index) => {
-            if (media.endsWith(".mp4")) {
-              return (
-                <video
-                  key={index}
-                  controls
-                  className="w-32 h-32 object-fill mr-2 mb-2"
-                >
-                  <source
+            </div>
+            <p className="text-base leading-loose mb-2">{post.content}</p>
+            {post.media.map((media, index) => {
+              if (media.endsWith(".mp4")) {
+                return (
+                  <video
+                    key={index}
+                    controls
+                    className="w-32 h-32 object-fill mr-2 mb-2"
+                  >
+                    <source
+                      src={`${import.meta.env.VITE_IMAGE_URL}/${media.replace(
+                        /\\/g,
+                        "/"
+                      )}`}
+                      type="video/mp4"
+                    />
+                    Your browser does not support the video tag.
+                  </video>
+                );
+              } else {
+                return (
+                  <img
+                    key={index}
+                    className="w-32 h-32 object-fill mr-2 mb-2"
                     src={`${import.meta.env.VITE_IMAGE_URL}/${media.replace(
                       /\\/g,
                       "/"
                     )}`}
-                    type="video/mp4"
+                    alt={`Post ${post.id} Image ${index}`}
                   />
-                  Your browser does not support the video tag.
-                </video>
-              );
-            } else {
-              return (
-                <img
-                  key={index}
-                  className="w-32 h-32 object-fill mr-2 mb-2"
-                  src={`${import.meta.env.VITE_IMAGE_URL}/${media.replace(
-                    /\\/g,
-                    "/"
-                  )}`}
-                  alt={`Post ${post.id} Image ${index}`}
-                />
-              );
-            }
-          })}
-          <div className="flex justify-between items-center mt-4">
-            <button
-              onClick={() => handleLike(post.id)}
-              className="text-gray-500 hover:underline flex items-center"
-            >
-              <FaHeart className="mr-1 text-red-500" />
-              Like ({post.likes.length})
-            </button>
-            <button
-              onClick={() => handleCommentClick(post)}
-              className="text-gray-500 hover:underline flex items-center"
-            >
-              <FaCommentDots className="mr-1 text-red-500" />
-              Comment ({post.comments.length})
-            </button>
-            <button className="text-gray-500 hover:underline flex items-center">
-              <IoIosShareAlt className="mr-1 text-red-500" />
-              Share
-            </button>
+                );
+              }
+            })}
+            <div className="flex justify-between items-center mt-4">
+              <button
+                onClick={() => handleLike(post.id)}
+                className="text-gray-500 hover:underline flex items-center"
+              >
+                <FaHeart className="mr-1 text-red-500" />
+                Like ({post.likes.length})
+              </button>
+              <button
+                onClick={() => handleCommentClick(post)}
+                className="text-gray-500 hover:underline flex items-center"
+              >
+                <FaCommentDots className="mr-1 text-red-500" />
+                Comment ({post.comments.length})
+              </button>
+              <button className="text-gray-500 hover:underline flex items-center">
+                <IoIosShareAlt className="mr-1 text-red-500" />
+                Share
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
 
       {selectedPost && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">

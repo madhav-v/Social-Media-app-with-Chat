@@ -123,6 +123,12 @@ const NavBar = () => {
                 className="navbar-link cool-link"
                 to="/home/notification"
               >
+                {/* <div className="relative">
+                  <div className="bg-[white] pl-[7px] font-semibold text-sm h-5 w-5 text-black rounded-full  absolute -top-[5px] -right-[6px]">
+                    1
+                  </div>
+                  <MdNotificationsNone size={30} color="white" />
+                </div> */}
                 <MdNotificationsNone size={30} color="white" />
               </NavLink>
             </li>

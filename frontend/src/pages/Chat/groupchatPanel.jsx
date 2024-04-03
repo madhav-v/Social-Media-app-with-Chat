@@ -181,34 +181,64 @@ const GroupPanel = () => {
               )}
             </div>
           </div>
-          <FaCircleInfo
-            size={25}
-            color="red"
-            className="mr-2 cursor-pointer"
-            onClick={() => setShowMemberModal(true)}
-          />
-          {showMemberModal && (
-            <div className="modal-overlay mr-5">
-              <div className="modal">
+          {showMemberModal ? (
+            <div className="modal-overlay mr-5 bg-[white] h-full w-[280px] rounded shadow-xl p-6 absolute z-10 top-0 -right-1">
+              <div className="modal ">
                 <span
-                  className="close cursor-pointer"
+                  className="close cursor-pointer absolute right-0 top-3"
                   onClick={() => setShowMemberModal(false)} // Close member modal
                 >
-                  <MdCancel size={20} color="red" className="m-1" />
+                  <MdCancel size={26} color="red" className="m-1" />
                 </span>
-                <h2>Group Members :</h2>
-                <ul>
-                  {groupMembers.map((member) => (
-                    <li key={member.id}>
-                      <span>
-                        {member.firstName} {member.lastName}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <h3>Admin: {groupAdmin.firstName}</h3>
+                <div className="mt-4 flex flex-col justify-between  ">
+                  {" "}
+                  <div>
+                    {" "}
+                    <h2 className="text-2xl font-semibold mb-3">
+                      Group Members :
+                    </h2>
+                    <ul className="mt-8">
+                      {groupMembers.map((member) => (
+                        <li key={member.id} className="my-3 ">
+                          <span className=" text-base font-medium flex items-center  gap-4">
+                            <span className="w-10 h-10 bg-[red]  rounded-full text-[white] text-xl pl-3 pt-1">
+                              {/* <img
+                              src={`${
+                                import.meta.env.VITE_IMAGE_URL
+                              }/${member?.profilePic.replace(/\\/g, "/")}`}
+                              alt="Image"
+                              className="h-10"
+                            /> */}
+                              {member.firstName[0]}
+                            </span>{" "}
+                            <span className="whitespace-nowrap">
+                              {member.firstName} {member.lastName}
+                            </span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <h3 className="mt-4">
+                    {" "}
+                    <span className="text-xl italic font-semibold mr-1">
+                      Admin:
+                    </span>{" "}
+                    <span className="text-gray-500 text-lg font-medium ">
+                      {" "}
+                      {groupAdmin.firstName} {groupAdmin.lastName}
+                    </span>
+                  </h3>
+                </div>
               </div>
             </div>
+          ) : (
+            <FaCircleInfo
+              size={25}
+              color="red"
+              className="mr-2 cursor-pointer"
+              onClick={() => setShowMemberModal(true)}
+            />
           )}
         </div>
         <div className="w-full h-[72vh]">

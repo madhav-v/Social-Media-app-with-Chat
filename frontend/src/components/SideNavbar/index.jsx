@@ -9,8 +9,6 @@ const SideNavBar = () => {
     const fetchUserData = async () => {
       try {
         const response = await authSvc.getLoggedInUser();
-        console.log("response", response);
-
         setUser(response.data);
       } catch (error) {
         console.log(error);
@@ -19,8 +17,6 @@ const SideNavBar = () => {
 
     fetchUserData();
   }, []);
-
-  console.log(user);
 
   return (
     <>
