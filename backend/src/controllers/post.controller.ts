@@ -282,6 +282,7 @@ export class PostController {
 
       await commentRepository.save(comment);
 
+
       await notificationCtrl.createNotification(
         post.user,
         req.user,

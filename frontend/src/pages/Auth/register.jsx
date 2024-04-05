@@ -24,9 +24,9 @@ const RegisterPage = () => {
     setIsLoading(true);
     try {
       let response = await authSvc.register(data);
-      if (response.status) {
+      if (response) {
         ToastAlert("success", "Registration Successful. Login to continue");
-        navigate("/login");
+        navigate("/");
       }
     } catch (exception) {
       setIsLoading(false);

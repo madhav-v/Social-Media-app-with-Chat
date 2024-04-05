@@ -52,7 +52,7 @@ export class FriendRequestController {
     } catch (error: any) {
       const statusCode = error.statusCode || 500;
       const message = error.message || "An error occurred";
-      const err = new ErrorHandler(message, statusCode); // Create an instance of ErrorHandler
+      const err = new ErrorHandler(message, statusCode);
       logger.error(`Error sending friend request: ${message}`, error);
       res.status(statusCode).json({
         error: err.message,

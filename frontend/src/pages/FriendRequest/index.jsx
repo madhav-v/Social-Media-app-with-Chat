@@ -5,11 +5,14 @@ import friendRequestService from "../../services/friendRequest.service";
 
 function Connection() {
   const [requests, setRequests] = useState([]);
+  const [requestId, setRequestId] = useState(null);
 
   const getFriendRequest = async () => {
     try {
       const response = await friendRequestService.getFriendRequest();
+      // console.log(response.friendRequests);
       setRequests(response.friendRequests);
+      setRequestId(response.friendRequests);
     } catch (error) {
       console.log(error);
     }
@@ -21,17 +24,21 @@ function Connection() {
 
   const handleAccept = async (id) => {
     const response = await friendRequestService.acceptFriendRequest({
-      recipientId: id,
+      requestId: id,
     });
     console.log(response);
     ToastAlert("success", "Friend Request Accepted");
   };
 
   const handleReject = async (id) => {
-    const response = await friendRequestService.deleteFriendRequest(id);
+    const response = await friendRequestService.deleteFriendRequest({
+      requestId: id,
+    });
     console.log(response);
     ToastAlert("success", "Friend Request Rejected");
   };
+
+  // console.log(requests);
   return (
     <>
       <div className="w-full min-h-screen bg-screen pt-[10vh] mt-2">
@@ -44,7 +51,6 @@ function Connection() {
           <div className="w-full">
             {requests.map((request) => (
               <div key={request.id}>
-                {/* Notification Card */}
                 <div className="flex items-center justify-between p-4 border-b border-[rgba(0,0,0,0.4)] my-4">
                   <div className="flex items-center">
                     <div className="w-16 h-16 px-2 py-2 rounded-full overflow-hidden">

@@ -18,6 +18,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+
         <Route path="/home" element={<InnerLayout />}>
           <Route index element={<DashBoard />} />
           <Route path="profile" element={<Profile />} />

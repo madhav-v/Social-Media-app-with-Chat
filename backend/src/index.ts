@@ -35,29 +35,6 @@ const io = new Server(server, {
   },
 });
 
-const withObject = {};
-const withArray = [];
-
-io.on("connection", (socket: Socket) => {
-  const user = { socket: socket };
-
-  console.log("A user connected", socket.id);
-
-  socket.on("like", (data) => {
-    socket.broadcast.emit("like", data);
-  });
-
-  socket.on("comment", async (data) => {
-    console.log(data);
-
-    socket.broadcast.emit("comment", data);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
-});
-
 createConnection({
   type: "postgres",
   host: "localhost",

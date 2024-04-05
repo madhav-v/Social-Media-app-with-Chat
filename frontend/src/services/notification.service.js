@@ -12,6 +12,21 @@ class NotificationService extends HttpService {
       throw error;
     }
   };
+
+  getNotificationsAfterTime = async (timestamp) => {
+    try {
+      const response = await this.getRequest(
+        `/v1/notification/after-time?timestamp=${timestamp}`,
+        {
+          auth: true,
+          file: false,
+        }
+      );
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  };
 }
 
 const notificationSvc = new NotificationService();

@@ -5,10 +5,10 @@ import { FaCommentDots, FaHeart } from "react-icons/fa";
 import ToastAlert from "../Toast";
 import { IoIosShareAlt } from "react-icons/io";
 import { formatDistanceToNow } from "date-fns";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 
 const Posts = () => {
-  const socket = io("http://localhost:3005");
+ 
   const [posts, setPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
   const [commentText, setCommentText] = useState("");
@@ -26,9 +26,6 @@ const Posts = () => {
   const handleLike = async (postId) => {
     try {
       const likesResponse = await postSvc.likePost(postId);
-
-      socket.emit("like", likesResponse.post);
-
       setLikes(likesResponse.post.likes.length);
       if (likesResponse) {
         ToastAlert("error", "You already liked post");
@@ -50,10 +47,11 @@ const Posts = () => {
       let data = { content: commentText };
 
       const commentResponse = await postSvc.commentPost(id, data);
-      socket.emit("comment", commentResponse.post);
-
       if (commentResponse) {
         ToastAlert("success", "Comment added successfully");
+        socket.emit("send-notification", {
+          notification: `New comment from `,
+        });
       }
       setCommentText("");
       setSelectedPost(null);
@@ -62,23 +60,11 @@ const Posts = () => {
     }
   };
 
+  
+
   useEffect(() => {
     allPosts();
   }, [commentText, likes]);
-
-  useEffect(() => {
-    socket.on("like", (data) => {
-      console.log("data", data);
-    });
-
-    socket.on("comment", (data) => {
-      console.log("comment", data);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
 
   return (
     <>
