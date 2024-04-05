@@ -25,12 +25,19 @@ class ChatService extends HttpService {
     }
   };
 
-  createGroupChat = async (data) => {
+  createGroupChat = async ({ name, users }) => {
     try {
-      const response = await this.postRequest("/v1/chats/createGroup", data, {
-        auth: true,
-        file: false,
-      });
+      const response = await this.postRequest(
+        "/v1/chats/createGroup",
+        {
+          name,
+          users,
+        },
+        {
+          auth: true,
+          file: false,
+        }
+      );
       return response;
     } catch (error) {
       throw error;
@@ -49,11 +56,14 @@ class ChatService extends HttpService {
     }
   };
 
-  removeFromGroup = async (data) => {
+  removeFromGroup = async ({ chatId, userId }) => {
     try {
       const response = await this.putRequest(
         "/v1/chats/removeFromGroup",
-        data,
+        {
+          chatId: chatId,
+          userId: userId,
+        },
         {
           auth: true,
           file: false,
@@ -65,12 +75,19 @@ class ChatService extends HttpService {
     }
   };
 
-  addToGroup = async (data) => {
+  addToGroup = async ({ chatId, userIds }) => {
     try {
-      const response = await this.putRequest("/v1/chats/addToGroup", data, {
-        auth: true,
-        file: false,
-      });
+      const response = await this.putRequest(
+        "/v1/chats/addToGroup",
+        {
+          chatId: chatId,
+          userIds: userIds,
+        },
+        {
+          auth: true,
+          file: false,
+        }
+      );
       return response;
     } catch (error) {
       throw error;

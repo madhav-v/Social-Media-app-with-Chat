@@ -4,7 +4,7 @@ import postSvc from "../../services/post.service";
 import { FaEdit, FaTrash } from "react-icons/fa"; // Import FontAwesome icons
 import ToastAlert from "../../components/Toast";
 import EditPost from "../../components/Posts/edit";
-
+import { Image } from "antd";
 const Profile = () => {
   const [user, setUser] = useState();
   const [posts, setPosts] = useState();
@@ -169,7 +169,8 @@ const Profile = () => {
                   );
                 } else {
                   return (
-                    <img
+                    <Image
+                      width={250}
                       key={index}
                       className="w-32 h-32 object-fill mr-2 mb-2"
                       src={`${import.meta.env.VITE_IMAGE_URL}/${media.replace(

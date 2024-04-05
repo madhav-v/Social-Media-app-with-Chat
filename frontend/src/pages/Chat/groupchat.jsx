@@ -12,7 +12,9 @@ const GroupChat = () => {
   const [friends, setFriends] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [groupChats, setGroupChats] = useState([]);
-
+  const [selectedFriendsForAddition, setSelectedFriendsForAddition] = useState(
+    []
+  );
   useEffect(() => {
     const fetchFriends = async () => {
       try {
@@ -32,16 +34,19 @@ const GroupChat = () => {
       console.error("Group name cannot be empty");
       return;
     }
-    if (selectedMembers.length === 0) {
+    if (selectedFriendsForAddition.length === 0) {
       console.error("Please select at least one member for the group");
       return;
     }
     let data = {
       name: groupName,
-      users: selectedMembers,
+      users: selectedFriendsForAddition,
     };
-    const response = await chatService.createGroupChat(data);
-    console.log(response);
+    console.log(data);
+    const response = await chatService.createGroupChat({
+      name: groupName,
+      users: selectedFriendsForAddition,
+    });
     setGroupName("");
     setSelectedMembers([]);
     setIsModalOpen(false);
@@ -51,29 +56,23 @@ const GroupChat = () => {
     const getGroupChats = async () => {
       const response = await groupSvc.getGroupChats();
       setGroupChats(response);
-      console.log(response);
     };
 
     getGroupChats();
   }, []);
 
-  const handleCheckboxChange = (event) => {
-    const { value, checked } = event.target;
-    if (checked) {
-      setSelectedMembers((prevSelectedMembers) => [
-        ...prevSelectedMembers,
-        value,
-      ]);
-    } else {
-      setSelectedMembers((prevSelectedMembers) =>
-        prevSelectedMembers.filter((memberId) => memberId !== value)
-      );
-    }
-  };
   const handleGroupChatClick = (groupId) => {
     navigate(`/home/groupchat/${groupId}`);
   };
-
+  const handleToggleFriendSelectionForAddition = (friendId) => {
+    if (selectedFriendsForAddition.includes(friendId)) {
+      setSelectedFriendsForAddition(
+        selectedFriendsForAddition.filter((id) => id !== friendId)
+      );
+    } else {
+      setSelectedFriendsForAddition([...selectedFriendsForAddition, friendId]);
+    }
+  };
   return (
     <>
       <div className="w-full md:basis-1/3 rounded-xl md:rounded-tr-none md:rounded-br-none bg-white py-2 border-r-2 border-[rgba(0 , 0, 0, 0.8)] lg:fixed lg:h-[90vh] lg:w-[30vw] lg:bottom-0 lg:left-0">
@@ -120,19 +119,26 @@ const GroupChat = () => {
                   <div className="mb-4">
                     <label className="block mb-1">Add Members:</label>
                     {friends.map((friend) => (
-                      <div key={friend.id} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id={`friend-${friend.id}`}
-                          value={friend.id}
-                          checked={selectedMembers.includes(friend.id)}
-                          onChange={handleCheckboxChange}
-                          className="mr-2"
-                        />
-                        <label htmlFor={`friend-${friend.id}`}>
-                          {friend.firstName} {friend.lastName}
-                        </label>
-                      </div>
+                      <li
+                        key={friend.id}
+                        className="flex items-center justify-between py-2"
+                      >
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            className="mr-2 form-checkbox text-red-500 border-red-500"
+                            checked={selectedFriendsForAddition.includes(
+                              friend.id
+                            )}
+                            onChange={() =>
+                              handleToggleFriendSelectionForAddition(friend.id)
+                            }
+                          />
+                          <span>
+                            {friend.firstName} {friend.lastName}
+                          </span>
+                        </div>
+                      </li>
                     ))}
                   </div>
                   <div className="text-center">
@@ -164,11 +170,11 @@ const GroupChat = () => {
                 <div className="bg-white p-4 rounded-lg shadow-md">
                   <h2 className="text-xl font-bold">{groupChat.name}</h2>
                   <div className="flex flex-wrap">
-                    <img
+                    {/* <img
                       src=""
                       alt={groupChat.chatName}
                       className="w-10 h-10 rounded-full"
-                    />
+                    /> */}
                     <p>{groupChat.chatName}</p>
                   </div>
                 </div>

@@ -157,18 +157,23 @@ export class ChatController {
   removeFromGroup = async (req: CustomRequest, res: Response) => {
     try {
       const { chatId, userId } = req.body;
+      console.log(chatId);
+      console.log(userId);
+
+      const chatIdNumber = parseInt(chatId);
+      const userIdNumber = parseInt(userId);
+
       const chatRepo = getRepository(Chat);
       const userRepo = getRepository(User);
+
       const updatedChat = await chatRepo.findOne({
-        where: { id: chatId },
+        where: { id: chatIdNumber },
         relations: ["users"],
       });
 
       if (!updatedChat) {
         throw new ErrorHandler("Chat not found", 404);
       }
-      const userIdNumber =
-        typeof userId === "string" ? parseInt(userId, 10) : userId;
 
       updatedChat.users = updatedChat.users.filter(
         (user) => user.id !== userIdNumber
@@ -187,32 +192,38 @@ export class ChatController {
 
   addToGroup = async (req: CustomRequest, res: Response) => {
     try {
-      const { chatId, userId } = req.body;
+      const { chatId, userIds } = req.body; // Expecting an array of userIds
+
+      const chatIdNumber = parseInt(chatId);
       const chatRepo = getRepository(Chat);
       const userRepo = getRepository(User);
       const updatedChat = await chatRepo.findOne({
-        where: { id: chatId },
+        where: { id: chatIdNumber },
         relations: ["users"],
       });
-      console.log(updatedChat);
 
       if (!updatedChat) {
         throw new ErrorHandler("Chat not found", 404);
       }
-      const userToAdd = await userRepo.findOne({
-        where: { id: userId },
-      });
-      if (!userToAdd) {
-        throw new ErrorHandler("User not found", 404);
+
+      // Find users by IDs
+      const usersToAdd = await userRepo.findByIds(userIds);
+
+      // Check if any user is not found
+      if (userIds.length !== usersToAdd.length) {
+        throw new ErrorHandler("One or more users not found", 404);
       }
-      updatedChat.users.push(userToAdd);
+
+      // Add users to the chat
+      updatedChat.users = [...updatedChat.users, ...usersToAdd];
       await chatRepo.save(updatedChat);
+
       res.json(updatedChat);
     } catch (error: any) {
       const statusCode = error.statusCode || 500;
       const message = error.message || "An error occurred";
       const err = new ErrorHandler(message, statusCode);
-      logger.error(`Error adding user to group chat: ${message}`, error);
+      logger.error(`Error adding user(s) to group chat: ${message}`, error);
       res.status(statusCode).json({ error: err.message });
     }
   };

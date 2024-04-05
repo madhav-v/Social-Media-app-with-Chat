@@ -6,9 +6,9 @@ import ToastAlert from "../Toast";
 import { IoIosShareAlt } from "react-icons/io";
 import { formatDistanceToNow } from "date-fns";
 import { io } from "socket.io-client";
+import { Image } from "antd";
 
 const Posts = () => {
- 
   const [posts, setPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
   const [commentText, setCommentText] = useState("");
@@ -59,8 +59,6 @@ const Posts = () => {
       console.log(exception);
     }
   };
-
-  
 
   useEffect(() => {
     allPosts();
@@ -121,9 +119,10 @@ const Posts = () => {
                 );
               } else {
                 return (
-                  <img
+                  <Image
                     key={index}
-                    className="w-32 h-32 object-fill mr-2 mb-2"
+                    width={250}
+                    className="w-32 h-32 object-fill mr-2 mb-2 flex"
                     src={`${import.meta.env.VITE_IMAGE_URL}/${media.replace(
                       /\\/g,
                       "/"

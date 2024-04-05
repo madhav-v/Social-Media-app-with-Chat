@@ -27,7 +27,7 @@ export class Chat {
   @JoinTable()
   users: User[];
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User)
   @JoinColumn()
   groupAdmin: User;
 

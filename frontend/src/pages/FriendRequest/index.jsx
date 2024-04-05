@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ToastAlert from "../../components/Toast";
 import { useNavigate } from "react-router-dom";
 import friendRequestService from "../../services/friendRequest.service";
-
+import { Image } from "antd";
 function Connection() {
   const [requests, setRequests] = useState([]);
   const [requestId, setRequestId] = useState(null);
@@ -54,7 +54,7 @@ function Connection() {
                 <div className="flex items-center justify-between p-4 border-b border-[rgba(0,0,0,0.4)] my-4">
                   <div className="flex items-center">
                     <div className="w-16 h-16 px-2 py-2 rounded-full overflow-hidden">
-                      <img
+                      <Image
                         src={
                           request.sender.profilePic
                             ? `${

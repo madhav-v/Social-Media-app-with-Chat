@@ -2,13 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import groupSvc from "../../services/groupChat.service";
 import { useParams } from "react-router-dom";
 import { RiSendPlaneFill } from "react-icons/ri";
-import { FaEdit, FaPlus, FaRegImage, FaTrash } from "react-icons/fa";
+import { FaCross, FaEdit, FaPlus, FaRegImage, FaTrash } from "react-icons/fa";
 import authSvc from "../../services/auth.service";
 import chatService from "../../services/chat.service";
 import { formatDistanceToNow } from "date-fns";
 import { MdCancel, MdDone } from "react-icons/md";
 import ToastAlert from "../../components/Toast";
 import { FaCircleInfo } from "react-icons/fa6";
+import friendRequestService from "../../services/friendRequest.service";
 
 const GroupPanel = () => {
   const params = useParams();
@@ -25,6 +26,9 @@ const GroupPanel = () => {
   const [showMemberModal, setShowMemberModal] = useState(false);
   const [groupMembers, setGroupMembers] = useState([]);
   const [groupAdmin, setGroupAdmin] = useState();
+  const [addModal, setAddModal] = useState(false);
+  const [friends, setFriends] = useState([]);
+  const [selectedFriends, setSelectedFriends] = useState([]);
   useEffect(() => {
     const getLoggedInUser = async () => {
       try {
@@ -92,7 +96,7 @@ const GroupPanel = () => {
       }
     };
     getGroupById();
-  }, []);
+  }, [id]);
 
   const sendMessage = async () => {
     try {
@@ -119,15 +123,13 @@ const GroupPanel = () => {
 
   useEffect(() => {
     getMessages();
-  }, []);
-  console.log(groupMembers);
+  }, [id]);
   const handleRemoveMember = async (memberId) => {
     try {
-      console.log(memberId);
-      // Implement remove member functionality
-      // const response = await groupSvc.removeMember(id, memberId);
-      // Update group members state
-      // setGroupMembers(response.members);
+      let chatId = id;
+      let userId = memberId;
+      const response = await chatService.removeFromGroup({ chatId, userId });
+      setGroupMembers(response.users);
       ToastAlert("success", "Member removed successfully");
     } catch (error) {
       console.error("Error removing member:", error);
@@ -135,15 +137,41 @@ const GroupPanel = () => {
     }
   };
 
-  const handleAddMember = async () => {
-    try {
-      // Implement add member functionality
-      // Show add member dialog or input field
-    } catch (error) {
-      console.error("Error adding member:", error);
-      ToastAlert("error", "Failed to add member");
+  const handleToggleFriendSelection = (friendId) => {
+    if (selectedFriends.includes(friendId)) {
+      setSelectedFriends(selectedFriends.filter((id) => id !== friendId));
+    } else {
+      setSelectedFriends([...selectedFriends, friendId]);
     }
   };
+
+  const handleAddMembersToGroup = async () => {
+    try {
+      const chatId = id;
+      const userIds = selectedFriends;
+      const response = await chatService.addToGroup({ chatId, userIds });
+      setGroupMembers(response.users);
+      setAddModal(false);
+      setSelectedFriends([]);
+      ToastAlert("success", "Members added successfully");
+    } catch (error) {
+      console.error("Error adding members:", error);
+      ToastAlert("error", "Failed to add members");
+    }
+  };
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const response = await friendRequestService.getFriends();
+        setFriends(response.friends);
+      } catch (error) {
+        console.error("Error fetching friends:", error);
+      }
+    };
+
+    fetchFriends();
+  }, []);
 
   return (
     <div className="w-[70%] ml-[30%] min-h-[90vh] md:h-full rounded-xl overflow-hidden relative md:rounded-tl-none md:rounded-bl-none">
@@ -182,54 +210,97 @@ const GroupPanel = () => {
             </div>
           </div>
           {showMemberModal ? (
-            <div className="modal-overlay mr-5 bg-[white] h-full w-[280px] rounded shadow-xl p-6 absolute z-10 top-0 -right-1">
-              <div className="modal ">
-                <span
-                  className="close cursor-pointer absolute right-0 top-3"
-                  onClick={() => setShowMemberModal(false)} // Close member modal
-                >
-                  <MdCancel size={26} color="red" className="m-1" />
-                </span>
-                <div className="mt-4 flex flex-col justify-between  ">
-                  {" "}
-                  <div>
-                    {" "}
-                    <h2 className="text-2xl font-semibold mb-3">
-                      Group Members :
-                    </h2>
-                    <ul className="mt-8">
-                      {groupMembers.map((member) => (
-                        <li key={member.id} className="my-3 ">
-                          <span className=" text-base font-medium flex items-center  gap-4">
-                            <span className="w-10 h-10 bg-[red]  rounded-full text-[white] text-xl pl-3 pt-1">
-                              {/* <img
-                              src={`${
-                                import.meta.env.VITE_IMAGE_URL
-                              }/${member?.profilePic.replace(/\\/g, "/")}`}
-                              alt="Image"
-                              className="h-10"
-                            /> */}
-                              {member.firstName[0]}
-                            </span>{" "}
-                            <span className="whitespace-nowrap">
-                              {member.firstName} {member.lastName}
-                            </span>
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <h3 className="mt-4">
-                    {" "}
-                    <span className="text-xl italic font-semibold mr-1">
-                      Admin:
-                    </span>{" "}
-                    <span className="text-gray-500 text-lg font-medium ">
-                      {" "}
-                      {groupAdmin.firstName} {groupAdmin.lastName}
-                    </span>
-                  </h3>
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md overflow-y-auto">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">Group Members</h2>
+                  <button
+                    onClick={() => setShowMemberModal(false)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <MdCancel size={25} color="red" />
+                  </button>
                 </div>
+                <ul>
+                  {groupMembers.map((member) => (
+                    <li
+                      key={member.id}
+                      className="flex items-center justify-between py-2"
+                    >
+                      <div className="flex items-center">
+                        <div className="h-8 w-8 rounded-full bg-red-500 text-white flex items-center justify-center mr-3">
+                          {member.firstName[0]}
+                        </div>
+                        <span>
+                          {member.firstName} {member.lastName}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveMember(member.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-4">
+                  <h3 className="text-lg font-semibold">Admin:</h3>
+                  <p>
+                    {groupAdmin.firstName} {groupAdmin.lastName}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setAddModal(true)}
+                  className="mt-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700"
+                >
+                  Add Members
+                </button>
+                {addModal && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md overflow-y-auto">
+                      <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold">Add Members</h2>
+                        <button
+                          onClick={() => setAddModal(false)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <MdCancel size={25} color="red" />
+                        </button>
+                      </div>
+                      <ul>
+                        {friends.map((friend) => (
+                          <li
+                            key={friend.id}
+                            className="flex items-center justify-between py-2"
+                          >
+                            <div className="flex items-center">
+                              <input
+                                type="checkbox"
+                                className="mr-2 form-checkbox text-red-500 border-red-500"
+                                checked={selectedFriends.includes(friend.id)}
+                                onChange={() =>
+                                  handleToggleFriendSelection(friend.id)
+                                }
+                              />
+                              <span>
+                                {friend.firstName} {friend.lastName}
+                              </span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-4">
+                        <button
+                          onClick={handleAddMembersToGroup}
+                          className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ) : (
@@ -241,57 +312,63 @@ const GroupPanel = () => {
             />
           )}
         </div>
+
         <div className="w-full h-[72vh]">
           <div className="chat-box w-full h-full flex flex-col-reverse overflow-y-auto">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${
-                  message.sender.id === userId ? "justify-end" : "justify-start"
-                }`}
-              >
+            {messages
+              .slice(0)
+              .reverse()
+              .map((message) => (
                 <div
-                  className={`p-2 mb-2 rounded-lg max-w-[70%] ${
+                  key={message.id}
+                  className={`flex ${
                     message.sender.id === userId
-                      ? "bg-red-500 text-white"
-                      : "bg-red-500 ml-3 text-white"
+                      ? "justify-end"
+                      : "justify-start"
                   }`}
                 >
-                  {message.images.length > 0 ? (
-                    <div className="max-w-[70%] h-[50%] mx-auto">
-                      <img
-                        src={`${
-                          import.meta.env.VITE_IMAGE_URL
-                        }/${message.images[0].replace(/\\/g, "/")}`}
-                        alt="Sent Image"
-                        className="rounded-lg w-[50%]"
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      className={`mb-2 rounded-lg max-w-[70%] ${
-                        message.sender.id === userId
-                          ? "bg-red-500 text-white"
-                          : "bg-red-500 ml-3 text-white"
-                      }`}
-                    >
-                      <p className="text-black text-sm">
-                        {message.sender.firstName}
-                      </p>
-                      <p>{message.content}</p>
-                    </div>
-                  )}
+                  <div
+                    className={`p-2 mb-2 rounded-lg max-w-[70%] ${
+                      message.sender.id === userId
+                        ? "bg-red-500 text-white"
+                        : "bg-red-500 ml-3 text-white"
+                    }`}
+                  >
+                    {message.images.length > 0 ? (
+                      <div className="max-w-[70%] h-[50%] mx-auto">
+                        <img
+                          src={`${
+                            import.meta.env.VITE_IMAGE_URL
+                          }/${message.images[0].replace(/\\/g, "/")}`}
+                          alt="Sent Image"
+                          className="rounded-lg w-[50%]"
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className={`mb-2 rounded-lg max-w-[70%] ${
+                          message.sender.id === userId
+                            ? "bg-red-500 text-white"
+                            : "bg-red-500 ml-3 text-white"
+                        }`}
+                      >
+                        <p className="text-black text-sm">
+                          {message.sender.firstName}
+                        </p>
+                        <p>{message.content}</p>
+                      </div>
+                    )}
 
-                  <div className="flex justify-between items-center mt-1">
-                    <p className="text-xs text-black">
-                      {formatDistanceToNow(new Date(message.createdAt), {
-                        addSuffix: true,
-                      })}
-                    </p>
+                    <div className="flex justify-between items-center mt-1">
+                      <p className="text-xs text-black">
+                        {formatDistanceToNow(new Date(message.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
 
