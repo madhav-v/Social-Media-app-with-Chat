@@ -3,7 +3,7 @@ import { MdSend } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
 import chatService from "../../services/chat.service";
 import { RiSendPlaneFill } from "react-icons/ri";
-
+import { Image } from "antd";
 import userSvc from "../../services/user.service";
 import authSvc from "../../services/auth.service";
 import { formatDistanceToNow } from "date-fns";
@@ -164,7 +164,7 @@ const ChatPanel = () => {
                   >
                     {message.images.length > 0 ? (
                       <div className="max-w-[70%] h-[50%] mx-auto">
-                        <img
+                        <Image
                           src={`${
                             import.meta.env.VITE_IMAGE_URL
                           }/${message.images[0].replace(/\\/g, "/")}`}

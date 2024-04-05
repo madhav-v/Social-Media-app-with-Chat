@@ -10,6 +10,7 @@ import { MdCancel, MdDone } from "react-icons/md";
 import ToastAlert from "../../components/Toast";
 import { FaCircleInfo } from "react-icons/fa6";
 import friendRequestService from "../../services/friendRequest.service";
+import { Image } from "antd";
 
 const GroupPanel = () => {
   const params = useParams();
@@ -336,7 +337,7 @@ const GroupPanel = () => {
                   >
                     {message.images.length > 0 ? (
                       <div className="max-w-[70%] h-[50%] mx-auto">
-                        <img
+                        <Image
                           src={`${
                             import.meta.env.VITE_IMAGE_URL
                           }/${message.images[0].replace(/\\/g, "/")}`}
