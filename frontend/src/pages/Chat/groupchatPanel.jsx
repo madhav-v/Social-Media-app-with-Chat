@@ -181,7 +181,6 @@ const GroupPanel = () => {
           <div className="px-2 flex items-center justify-center basis-1/3">
             <div className="relative w-[50px] h-[50px] md:w-[70px] md:h-[70px]  rounded-[50%] ml-[-30%]"></div>
             <div className="flex items-center ml-2">
-              {/* <p className="ml-2 text-lg">{groups.chatName}</p> */}
               {editingName ? (
                 <>
                   <input
