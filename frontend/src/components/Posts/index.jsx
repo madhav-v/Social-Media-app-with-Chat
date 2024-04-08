@@ -7,6 +7,7 @@ import { IoIosShareAlt } from "react-icons/io";
 import { formatDistanceToNow } from "date-fns";
 import { io } from "socket.io-client";
 import { Image } from "antd";
+import { sendNotification } from "../firebase";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
@@ -47,11 +48,17 @@ const Posts = () => {
       let data = { content: commentText };
 
       const commentResponse = await postSvc.commentPost(id, data);
+      console.log("comment", commentResponse);
       if (commentResponse) {
         ToastAlert("success", "Comment added successfully");
-        socket.emit("send-notification", {
-          notification: `New comment from `,
-        });
+        const postOwnerFCMToken = commentResponse.post.user.fcmToken;
+        if (postOwnerFCMToken) {
+          sendNotification(
+            postOwnerFCMToken,
+            "New comment on your post",
+            "Someone commented on your post"
+          );
+        }
       }
       setCommentText("");
       setSelectedPost(null);

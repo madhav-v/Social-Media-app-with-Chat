@@ -34,4 +34,7 @@ export class User {
 
   @Column({ nullable: true })
   coverPic: string;
+
+  @Column({ nullable: true })
+  fcmToken: string;
 }

@@ -7,7 +7,7 @@ const CreatePost = () => {
   const [content, setContent] = useState("");
   const [mediaFiles, setMediaFiles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false); // State to control form visibility
+  const [showForm, setShowForm] = useState(false);
 
   const handleContentChange = (e) => {
     setContent(e.target.value);
@@ -38,12 +38,16 @@ const CreatePost = () => {
   };
 
   const handleCreatePostClick = () => {
-    setShowForm(true); // Show the form fields when clicked
+    setShowForm(true);
+  };
+
+  const handleCancel = () => {
+    setShowForm(false);
   };
 
   return (
     <div className="bg-white rounded-lg shadow-lg w-[50%] p-4 mb-4 mx-auto">
-      {!showForm && ( // Render the button/text if the form is not shown
+      {!showForm && (
         <button
           onClick={handleCreatePostClick}
           className="bg-red-500 mx-a text-white py-2 px-4 rounded hover:bg-red-600"
@@ -51,7 +55,7 @@ const CreatePost = () => {
           Create Post
         </button>
       )}
-      {showForm && ( // Render the form if showForm is true
+      {showForm && (
         <>
           <h2 className="text-xl font-bold mb-4">Create Post</h2>
           <form onSubmit={handleSubmit}>
@@ -75,6 +79,13 @@ const CreatePost = () => {
               disabled={!content || isLoading}
             >
               {isLoading ? "Creating..." : "Create Post"}
+            </button>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400 ml-2"
+            >
+              Cancel
             </button>
           </form>
         </>

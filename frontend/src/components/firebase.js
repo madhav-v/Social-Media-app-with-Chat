@@ -1,45 +1,34 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
+
 const firebaseConfig = {
-  apiKey: "AIzaSyB-a5cni6lLdOtuOtq03WovHU1z8r1v-RQ",
-  authDomain: "fir-cloud-92a40.firebaseapp.com",
-  projectId: "fir-cloud-92a40",
-  storageBucket: "fir-cloud-92a40.appspot.com",
-  messagingSenderId: "1034750118814",
-  appId: "1:1034750118814:web:d8132aaa1badc77467e48f",
+  apiKey: "AIzaSyD6FGV9nxVTFLi588QkycjZ8GqKi2GKxLU",
+  authDomain: "push-e8e67.firebaseapp.com",
+  projectId: "push-e8e67",
+  storageBucket: "push-e8e67.appspot.com",
+  messagingSenderId: "964531625477",
+  appId: "1:964531625477:web:63108d5b235517de45466c",
+  measurementId: "G-98G98SJBTJ",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-const messaging = getMessaging(app);
+export const messaging = getMessaging(app);
 
-export const requestPermission = () => {
+export const requestPermission = async () => {
   console.log("Requesting User Permission");
-  Notification.requestPermission().then((permission) => {
-    if (permission === "granted") {
-      console.log("Notification permission granted.");
-      return getToken(messaging, {
-        vapidKey:
-          "BMhV9t0zZGlsuSq11bpFc1ZVDYA8borJpJX9xaQ-EBg1bebjyqeYC9xC2NV8kjtH6YIwM8zQPMMUcZ67ufaHIJU",
-      })
-        .then((currentToken) => {
-          if (currentToken) {
-            console.log("Token: ", currentToken);
-          } else {
-            console.log(
-              "No registration token available. Request permission to generate one."
-            );
-          }
-        })
-        .catch((err) => {
-          console.log("An error occurred while retrieving token. ", err);
-        });
-    } else {
-      console.log("Unable to get permission to notify.");
-    }
-  });
+  const permission = await Notification.requestPermission();
+  console.log(permission);
+
+  if (permission == "granted") {
+    const token = await getToken(messaging, {
+      vapidKey:
+        "BLANwcsFnLYlZk_6Fs8nramtJ97SZgaXIAbSC0Jw26n7yKvwQzFH1n2Bc724m61vRJAtcfUriRFDpIgBrYGZPJ4",
+    });
+    console.log(token);
+  }
 };
 
 requestPermission();
@@ -55,4 +44,46 @@ export const onMessageListener = () => {
       reject
     );
   });
+};
+getToken(messaging, {
+  vapidKey:
+    "BMhV9t0zZGlsuSq11bpFc1ZVDYA8borJpJX9xaQ-EBg1bebjyqeYC9xC2NV8kjtH6YIwM8zQPMMUcZ67ufaHIJU",
+});
+
+export const requestPermissionAndRetrieveToken = async () => {
+  try {
+    // Request permission for notifications
+    const permission = await Notification.requestPermission();
+    console.log(permission);
+
+    if (permission === "granted") {
+      // Retrieve the FCM token
+      const token = await getToken(messaging);
+      console.log(token);
+      return token;
+    }
+  } catch (error) {
+    console.error("Error getting FCM token:", error);
+    return null;
+  }
+};
+
+export const sendNotification = async (token, title, body) => {
+  const message = {
+    token: token,
+    notification: {
+      title: title,
+      body: body,
+    },
+  };
+
+  console.log("message", message);
+
+  try {
+    // Send the message
+    await messaging.send(message);
+    console.log("Notification sent successfully");
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
 };

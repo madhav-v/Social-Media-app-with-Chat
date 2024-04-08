@@ -9,6 +9,7 @@ import authSvc from "../../services/auth.service";
 import ToastAlert from "../../components/Toast";
 import Loading from "../../components/Loading";
 import React from "react";
+import { requestPermissionAndRetrieveToken } from "../../components/firebase";
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +25,10 @@ const LoginPage = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      let response = await authSvc.login(data);
+      const fcmToken = await requestPermissionAndRetrieveToken();
+      console.log("token", fcmToken);
+      let credentials = { ...data, fcm_token: fcmToken };
+      let response = await authSvc.login(credentials);
       if (response.status) {
         let formattedData = {
           id: response.user.id,

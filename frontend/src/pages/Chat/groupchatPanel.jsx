@@ -189,11 +189,7 @@ const GroupPanel = () => {
                     onChange={(e) => setEditedName(e.target.value)}
                   />
                   <button onClick={handleSubmitName}>
-                    <MdDone
-                      className="bg-red-500 rounded-full"
-                      color="green"
-                      size={25}
-                    />
+                    <MdDone color="red" size={25} />
                   </button>
                   <button onClick={handleEditClose}>
                     <MdCancel color="red" size={25} />
@@ -203,7 +199,7 @@ const GroupPanel = () => {
                 <>
                   <p className="ml-2 text-lg">{groups.chatName}</p>
                   <button onClick={handleEditName} className="ml-4">
-                    <FaEdit size={25} color="red" />
+                    <FaEdit size={20} color="red" />
                   </button>
                 </>
               )}

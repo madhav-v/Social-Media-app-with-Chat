@@ -19,8 +19,22 @@ import GroupChat from "./pages/Chat/groupchat";
 import GroupLayout from "./pages/Chat/groupchat.layout";
 import GroupPanel from "./pages/Chat/groupchatPanel";
 import Notification from "./pages/Notification";
-
+import { useEffect } from "react";
+import { requestPermission, messaging } from "./components/firebase";
+import { onMessage } from "firebase/messaging";
+import ToastAlert from "./components/Toast";
 function App() {
+  useEffect(() => {
+    requestPermission();
+    onMessage(messaging, (payload) => {
+      console.log(payload);
+      ToastAlert(
+        "success",
+        payload.notification.title,
+        payload.notification.body
+      );
+    });
+  }, []);
   return (
     <>
       <Routes>

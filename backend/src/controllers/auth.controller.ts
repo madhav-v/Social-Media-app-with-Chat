@@ -49,6 +49,7 @@ export class AuthController {
   login = async (req: Request, res: Response) => {
     try {
       const data = req.body;
+
       const userRepository = getRepository(User);
       const user = await userRepository.findOne({
         where: { email: data.email },
@@ -62,6 +63,11 @@ export class AuthController {
       );
       if (!isPasswordValid) {
         throw new ErrorHandler("Invalid credentials", 401);
+      }
+
+      if (data.fcm_token) {
+        user.fcmToken = data.fcm_token;
+        await userRepository.save(user);
       }
       const accessToken = jwt.sign({ id: user.id }, env.JWT_SECRET, {
         expiresIn: 86400,
